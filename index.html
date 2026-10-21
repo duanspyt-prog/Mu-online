@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tower Defense Mobile - Bản Đồ Đồi Núi</title>
+    <title>Tower Defense Mobile - HD Assets</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
         body { background: #050508; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
@@ -15,11 +15,11 @@
         .hud-group { display: flex; gap: 6px; font-size: 11px; font-weight: bold; }
         .badge { background: #222634; padding: 4px 8px; border-radius: 6px; border: 1px solid #444; display: flex; align-items: center; gap: 4px; }
         
-        #canvas-container { flex: 1; width: 100%; position: relative; background: #1e251e; display: flex; justify-content: center; align-items: center; }
+        #canvas-container { flex: 1; width: 100%; position: relative; background: #1b261b; display: flex; justify-content: center; align-items: center; }
         canvas { width: 100%; height: 100%; display: block; }
 
-        /* Panel Nâng Cấp Nhanh */
-        #action-toast { position: absolute; bottom: 110px; left: 50%; transform: translateX(-50%); background: rgba(20,24,36,0.95); border: 1px solid #ffd700; border-radius: 8px; padding: 8px 14px; display: none; gap: 12px; align-items: center; z-index: 8; box-shadow: 0 4px 15px rgba(0,0,0,0.6); }
+        /* Panel Nâng Cấp Toast */
+        #action-toast { position: absolute; bottom: 110px; left: 50%; transform: translateX(-50%); background: rgba(20,24,36,0.96); border: 1px solid #ffd700; border-radius: 8px; padding: 8px 14px; display: none; gap: 12px; align-items: center; z-index: 8; box-shadow: 0 4px 15px rgba(0,0,0,0.8); }
         #action-toast button { background: #fbc531; border: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; color: #000; font-size: 11px; cursor: pointer; }
 
         /* Bottom Controls */
@@ -55,11 +55,12 @@
     <!-- Top HUD -->
     <div id="top-bar">
         <div class="hud-group">
+            <div class="badge">🗺️ <span id="txt-map">Map 1</span></div>
             <div class="badge">❤️ <span id="txt-life">20</span></div>
-            <div class="badge">🌊 Wave <span id="txt-wave">1/10</span></div>
+            <div class="badge">🌊 Wave <span id="txt-wave">1/5</span></div>
         </div>
         <div class="hud-group">
-            <div class="badge"><span style="color:#fbc531">🪙</span> <span id="txt-gold">300</span></div>
+            <div class="badge"><span style="color:#fbc531">🪙</span> <span id="txt-gold">250</span></div>
             <div class="badge"><span style="color:#00a8ff">💎</span> <span id="txt-gem">100</span></div>
         </div>
     </div>
@@ -68,7 +69,7 @@
     <div id="canvas-container">
         <canvas id="gameCanvas"></canvas>
         <div id="action-toast">
-            <span id="toast-text" style="font-size:11px; color:#ffd700;">Pháo Đài Lv.1</span>
+            <span id="toast-text" style="font-size:11px; color:#ffd700;">Pháo Đài (Lv.1)</span>
             <button onclick="upgradeActiveTower()">Nâng cấp (<span id="toast-cost">70</span>🪙)</button>
             <button onclick="hideToast()" style="background:#555; color:#fff;">✕</button>
         </div>
@@ -77,9 +78,9 @@
     <!-- Bottom Controls -->
     <div id="bottom-panel">
         <div class="build-row">
-            <button class="btn-build" id="btn-s1" onclick="selectBuild('cannon', 50)">💣 Pháo Đài<span>50 Vàng</span></button>
-            <button class="btn-build" id="btn-s2" onclick="selectBuild('laser', 90)">⚡ Trụ Lôi Điện<span>90 Vàng</span></button>
-            <button class="btn-build" id="btn-s3" onclick="selectBuild('missile', 120)">🚀 Trụ Tên Lửa<span>120 Vàng</span></button>
+            <button class="btn-build" id="btn-s1" onclick="selectBuild('cannon', 60)">💣 Pháo Thần Công<span>60 Vàng</span></button>
+            <button class="btn-build" id="btn-s2" onclick="selectBuild('laser', 100)">⚡ Trụ Lôi Điện<span>100 Vàng</span></button>
+            <button class="btn-build" id="btn-s3" onclick="selectBuild('missile', 130)">🚀 Trụ Tên Lửa<span>130 Vàng</span></button>
         </div>
         <nav>
             <button class="nav-item active" onclick="closeAllModals()"><span class="nav-icon">⚔️</span><span>Chiến Trường</span></button>
@@ -96,7 +97,7 @@
             <button class="btn-close" onclick="closeAllModals()">✕</button>
         </div>
         <div class="modal-bdy" id="bag-list">
-            <p style="font-size:11px; color:#888; text-align:center;">Tiêu diệt đoàn xe địch để nhận trang bị hiếm.</p>
+            <p style="font-size:11px; color:#888; text-align:center;">Tiêu diệt xe địch nhận trang bị hiếm.</p>
         </div>
     </div>
 
@@ -137,15 +138,39 @@
 
 <script>
     let state = {
-        gold: 300, gem: 100, life: 20, wave: 1, maxWave: 10,
+        mapIndex: 0,
+        gold: 250, gem: 100, life: 20, wave: 1, maxWave: 5,
         inventory: [], atkBuff: 1
     };
 
-    const path = [
-        {x: 40, y: 30}, {x: 360, y: 30},
-        {x: 360, y: 150}, {x: 70, y: 150},
-        {x: 70, y: 280}, {x: 360, y: 280},
-        {x: 360, y: 410}, {x: 40, y: 410}
+    // BỘ ASSET HÌNH ẢNH GAME MOBILE HD (PNG Trong Suốt)
+    const assets = {};
+    const assetURLs = {
+        tank: 'https://api.iconify.design/game-icons:tank.svg?color=%2338a169',
+        bossTank: 'https://api.iconify.design/game-icons:tank.svg?color=%23e53e3e',
+        towerCannon: 'https://api.iconify.design/game-icons:cannon.svg?color=%23ecc94b',
+        towerLaser: 'https://api.iconify.design/game-icons:lightning-trio.svg?color=%233182ce',
+        towerMissile: 'https://api.iconify.design/game-icons:rocket.svg?color=%23e53e3e'
+    };
+
+    for(let k in assetURLs) {
+        assets[k] = new Image();
+        assets[k].src = assetURLs[k];
+    }
+
+    const maps = [
+        {
+            name: "Đồi Xanh Map 1",
+            bgColor: "#1b261b",
+            pathColor: "#334155",
+            path: [{x:30,y:40},{x:360,y:40},{x:360,y:170},{x:70,y:170},{x:70,y:300},{x:360,y:300},{x:360,y:430},{x:30,y:430}]
+        },
+        {
+            name: "Sa Mạc Map 2",
+            bgColor: "#2d2013",
+            pathColor: "#4a3b2c",
+            path: [{x:200,y:20},{x:200,y:120},{x:50,y:120},{x:50,y:280},{x:350,y:280},{x:350,y:420},{x:50,y:420}]
+        }
     ];
 
     let canvas = document.getElementById('gameCanvas');
@@ -166,15 +191,16 @@
     let activeTower = null;
 
     function spawnEnemy() {
+        let currentMap = maps[state.mapIndex];
         let isBoss = (state.wave === state.maxWave && enemies.length === 0);
         enemies.push({
-            x: path[0].x, y: path[0].y,
+            x: currentMap.path[0].x, y: currentMap.path[0].y,
             pathIndex: 0,
             isBoss: isBoss,
-            hp: isBoss ? (600 + state.wave * 200) : (90 + state.wave * 45),
-            maxHp: isBoss ? (600 + state.wave * 200) : (90 + state.wave * 45),
-            speed: isBoss ? 0.7 : (1.1 + state.wave * 0.07),
-            size: isBoss ? 22 : 14
+            hp: isBoss ? (700 + state.mapIndex * 500) : (100 + state.wave * 40 + state.mapIndex * 150),
+            maxHp: isBoss ? (700 + state.mapIndex * 500) : (100 + state.wave * 40 + state.mapIndex * 150),
+            speed: isBoss ? 0.7 : (1.0 + state.wave * 0.08),
+            size: isBoss ? 32 : 22
         });
     }
 
@@ -196,8 +222,7 @@
         let x = e.clientX - rect.left;
         let y = e.clientY - rect.top;
 
-        // Click vào trụ có sẵn để nâng cấp
-        let clicked = towers.find(t => Math.hypot(t.x - x, t.y - y) < 22);
+        let clicked = towers.find(t => Math.hypot(t.x - x, t.y - y) < 24);
         if(clicked) {
             activeTower = clicked;
             showToast(clicked);
@@ -206,11 +231,10 @@
 
         hideToast();
 
-        // Xây trụ ngay lập tức
         if(selectedType) {
             if(state.gold >= selectedCost) {
                 state.gold -= selectedCost;
-                towers.push({ x: x, y: y, type: selectedType, level: 1, range: 100, atk: 30, cooldown: 0 });
+                towers.push({ x: x, y: y, type: selectedType, level: 1, range: 105, atk: 35, cooldown: 0 });
                 updateHUD();
             }
         }
@@ -236,65 +260,36 @@
             state.gold -= cost;
             activeTower.level++;
             activeTower.atk += 25;
-            activeTower.range += 12;
+            activeTower.range += 10;
             updateHUD();
             showToast(activeTower);
         }
     }
 
-    // Hàm vẽ hình ngọn núi / đồi trang trí bản đồ
-    function drawMountain(x, y, scale) {
-        ctx.fillStyle = '#2d3748';
-        ctx.beginPath();
-        ctx.moveTo(x, y + 25 * scale);
-        ctx.lineTo(x - 30 * scale, y - 20 * scale);
-        ctx.lineTo(x + 30 * scale, y - 20 * scale);
-        ctx.closePath();
-        ctx.fill();
-        // Đỉnh tuyết phủ
-        ctx.fillStyle = '#edf2f7';
-        ctx.beginPath();
-        ctx.moveTo(x, y - 20 * scale);
-        ctx.lineTo(x - 12 * scale, y - 5 * scale);
-        ctx.lineTo(x + 12 * scale, y - 5 * scale);
-        ctx.closePath();
-        ctx.fill();
-    }
-
     function gameLoop() {
-        // Nền bản đồ phong cách đồi núi cao nguyên
-        ctx.fillStyle = '#1a2e22';
+        let currentMap = maps[state.mapIndex];
+        ctx.fillStyle = currentMap.bgColor;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Vẽ các khối đồi núi trang trí xung quanh bản đồ
-        drawMountain(60, 220, 1.2);
-        drawMountain(370, 220, 1.0);
-        drawMountain(215, 80, 0.8);
-        drawMountain(215, 350, 1.1);
-
-        // 1. Vẽ Đường Đi (Mặt đường nhựa xám đậm có viền đá)
-        ctx.strokeStyle = '#2b2d42';
+        // 1. Vẽ Đường Đi
+        ctx.strokeStyle = currentMap.pathColor;
         ctx.lineWidth = 32;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.beginPath();
-        ctx.moveTo(path[0].x, path[0].y);
-        for(let i=1; i<path.length; i++) ctx.lineTo(path[i].x, path[i].y);
+        ctx.moveTo(currentMap.path[0].x, currentMap.path[0].y);
+        for(let i=1; i<currentMap.path.length; i++) ctx.lineTo(currentMap.path[i].x, currentMap.path[i].y);
         ctx.stroke();
 
-        ctx.strokeStyle = '#4a5568';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        // 2. Cập nhật & Vẽ Đoàn Xe/Quái Địch chi tiết
+        // 2. Cập nhật & Vẽ Xe Tăng Địch (Hình Đồ Họa HD)
         for(let i = enemies.length - 1; i >= 0; i--) {
             let en = enemies[i];
-            let target = path[en.pathIndex + 1];
+            let target = currentMap.path[en.pathIndex + 1];
             if(!target) {
                 enemies.splice(i, 1);
                 state.life--;
                 if(state.life <= 0) {
-                    state.life = 20; state.wave = 1; state.gold = 300; towers = [];
+                    state.life = 20; state.wave = 1; state.gold = 250; towers = [];
                 }
                 updateHUD();
                 continue;
@@ -309,25 +304,22 @@
                 en.y += (dy / dist) * en.speed;
             }
 
-            // Vẽ xe bọc thép chi tiết hơn
-            ctx.fillStyle = en.isBoss ? '#dd6b20' : '#38a169';
-            ctx.fillRect(en.x - en.size, en.y - en.size, en.size * 2, en.size * 2);
-            ctx.fillStyle = '#1a202c'; // Thân xe
-            ctx.fillRect(en.x - en.size + 3, en.y - en.size + 3, en.size * 2 - 6, en.size * 2 - 6);
-            // Nòng súng xe tăng địch
-            ctx.fillStyle = '#e2e8f0';
-            ctx.fillRect(en.x - 2, en.y - en.size - 4, 4, 8);
+            // Vẽ Hình Ảnh Đồ Họa Địch
+            let img = en.isBoss ? assets.bossTank : assets.tank;
+            if(img.complete) {
+                ctx.drawImage(img, en.x - en.size/2, en.y - en.size/2, en.size, en.size);
+            }
 
             // Thanh máu
             ctx.fillStyle = '#111';
-            ctx.fillRect(en.x - 16, en.y - en.size - 10, 32, 5);
-            ctx.fillStyle = '#e53e3e';
-            ctx.fillRect(en.x - 16, en.y - en.size - 10, (en.hp / en.maxHp) * 32, 5);
+            ctx.fillRect(en.x - 16, en.y - en.size/2 - 8, 32, 5);
+            ctx.fillStyle = en.isBoss ? '#ffd700' : '#e53e3e';
+            ctx.fillRect(en.x - 16, en.y - en.size/2 - 8, (en.hp / en.maxHp) * 32, 5);
         }
 
-        // 3. Cập nhật & Vẽ Trụ Phòng Thủ có hình thù rõ ràng
+        // 3. Cập nhật & Vẽ Trụ Phòng Thủ (Hình Đồ Họa HD)
         towers.forEach(t => {
-            // Đế bệ trụ kiên cố
+            // Đáy bệ trụ
             ctx.beginPath();
             ctx.arc(t.x, t.y, 18, 0, Math.PI * 2);
             ctx.fillStyle = '#2d3748';
@@ -336,21 +328,17 @@
             ctx.strokeStyle = '#ecc94b';
             ctx.stroke();
 
-            // Hình thù tháp theo loại
-            ctx.fillStyle = t.type === 'cannon' ? '#e53e3e' : (t.type === 'laser' ? '#d69e2e' : '#3182ce');
-            ctx.beginPath();
-            ctx.arc(t.x, t.y, 10, 0, Math.PI * 2);
-            ctx.fill();
+            // Vẽ Hình Ảnh Trụ HD
+            let tImg = t.type === 'cannon' ? assets.towerCannon : (t.type === 'laser' ? assets.towerLaser : assets.towerMissile);
+            if(tImg.complete) {
+                ctx.drawImage(tImg, t.x - 14, t.y - 14, 28, 28);
+            }
 
-            // Vẽ nòng súng hướng lên trên tạo khối 3D rõ ràng
-            ctx.fillStyle = '#cbd5e0';
-            ctx.fillRect(t.x - 3, t.y - 16, 6, 12);
-
-            // Hiển thị cấp độ
+            // Cấp độ
             ctx.fillStyle = '#ecc94b';
             ctx.font = 'bold 10px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText(`Lv.${t.level}`, t.x, t.y + 28);
+            ctx.fillText(`Lv.${t.level}`, t.x, t.y + 26);
 
             if(t.cooldown > 0) t.cooldown--;
             else {
@@ -363,14 +351,14 @@
 
                     effects.push({
                         x1: t.x, y1: t.y, x2: target.x, y2: target.y,
-                        alpha: 1.0, crit: isCrit, color: t.type === 'laser' ? '#d69e2e' : '#e53e3e'
+                        alpha: 1.0, crit: isCrit, color: t.type === 'laser' ? '#3182ce' : '#ecc94b'
                     });
 
                     if(target.hp <= 0) {
-                        state.gold += target.isBoss ? 120 : 30;
+                        state.gold += target.isBoss ? 150 : 30;
                         
                         if(Math.random() <= 0.01) {
-                            state.inventory.push("🛡️ Giáp Chiến Trường Huyền Thoại (Drop 1%)");
+                            state.inventory.push("🛡️ Giáp Chiến Trường (Drop 1%)");
                         }
 
                         let idx = enemies.indexOf(target);
@@ -378,9 +366,16 @@
 
                         if(enemies.length === 0) {
                             state.wave++;
+                            // CHUYỂN MAP & RESET TRỤ CŨ
                             if(state.wave > state.maxWave) {
-                                state.wave = 1;
-                                alert("🏆 CHÚC MỪNG BẠN ĐÃ CHIẾN THẮNG TOÀN BỘ ẢI!");
+                                if(state.mapIndex < maps.length - 1) {
+                                    state.mapIndex++;
+                                    state.wave = 1;
+                                    towers = []; // RE-SET LÀM MỚI TOÀN BỘ TRỤ
+                                    alert(`🎉 BẠN ĐÃ QUA MAP 1! Chuyển sang ${maps[state.mapIndex].name}. Toàn bộ trụ đã được reset để chuẩn bị cho trận chiến khó hơn!`);
+                                } else {
+                                    alert("🏆 BẠN ĐÃ THÔNG QUAN BẢN ĐỒ TOÀN BỘ GAME!");
+                                }
                             }
                         }
                         updateHUD();
@@ -389,7 +384,7 @@
             }
         });
 
-        // 4. Hiệu ứng đạn & Chữ CRITICAL
+        // 4. Hiệu ứng đạn & CRITICAL
         for(let i = effects.length - 1; i >= 0; i--) {
             let ef = effects[i];
             ctx.strokeStyle = ef.color;
@@ -410,6 +405,7 @@
     }
 
     function updateHUD() {
+        document.getElementById('txt-map').innerText = `Map ${state.mapIndex + 1}`;
         document.getElementById('txt-life').innerText = state.life;
         document.getElementById('txt-wave').innerText = `${state.wave}/${state.maxWave}`;
         document.getElementById('txt-gold').innerText = state.gold;
