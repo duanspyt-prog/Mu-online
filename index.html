@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tiên Kiếm Truyền Kỳ - Mobile AFK</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+        body { background: #0a0a0c; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
+        
+        /* Khung màn hình Mobile */
+        #mobile-app { width: 100%; max-width: 430px; height: 100vh; max-height: 932px; background: #121318; display: flex; flex-direction: column; border: 1px solid #2a2b36; position: relative; overflow: hidden; }
+        
+        /* Header thông tin nhân vật */
+        header { background: linear-gradient(180deg, #1f2029, #121318); padding: 12px; border-bottom: 1px solid #2a2b36; display: flex; flex-direction: column; gap: 8px; }
+        .user-info { display: flex; justify-content: space-between; align-items: center; }
+        .user-realm { font-weight: bold; color: #ffd700; font-size: 15px; }
+        .currency { display: flex; gap: 12px; font-size: 13px; font-weight: bold; }
+        .coin { color: #ffcc00; }
+        .gem { color: #00e5ff; }
+        
+        .bar-group { display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: #aaa; }
+        .progress-bg { width: 100%; height: 8px; background: #222; border-radius: 4px; overflow: hidden; border: 1px solid #333; }
+        .progress-fill { height: 100%; transition: width 0.3s; }
+        .hp-fill { background: #ff4757; }
+        .exp-fill { background: #ffa502; }
+
+        /* Vùng chiến đấu trung tâm */
+        .battle-zone { flex: 1; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 15px; background: radial-gradient(circle, #1a1c24 0%, #0d0e12 100%); position: relative; }
+        .monster-card { text-align: center; margin-top: 20px; }
+        .monster-avatar { font-size: 70px; filter: drop-shadow(0 0 15px rgba(255, 71, 87, 0.4)); animation: float 2s infinite ease-in-out; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .monster-name { font-size: 16px; font-weight: bold; color: #ff6b81; margin-top: 8px; }
+        
+        .action-area { width: 100%; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+        .btn-main { width: 100%; padding: 14px; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; active { transform: scale(0.98); } }
+        .btn-attack { background: linear-gradient(135deg, #ff4757, #ff6b81); color: #fff; box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4); }
+        .btn-auto { background: linear-gradient(135deg, #2ed573, #7bed9f); color: #000; }
+
+        /* Nhật ký */
+        .log-container { width: 100%; height: 80px; background: rgba(0,0,0,0.4); border-radius: 8px; padding: 8px; font-size: 11px; overflow-y: auto; display: flex; flex-direction: column-reverse; border: 1px solid #222; }
+        .log-item { margin-bottom: 2px; color: #ccc; }
+        .log-gain { color: #2ed573; }
+        .log-item-get { color: #00e5ff; }
+
+        /* Navigation Bar Dưới Cùng */
+        nav { height: 60px; background: #1a1b23; border-top: 1px solid #2a2b36; display: flex; justify-content: space-around; align-items: center; }
+        .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; color: #888; font-size: 11px; background: none; border: none; cursor: pointer; width: 25%; }
+        .nav-btn.active { color: #ffd700; }
+        .nav-icon { font-size: 20px; }
+
+        /* Modal Overlay (Túi đồ, Shop, Nạp tiền) */
+        .modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #121318; z-index: 10; display: none; flex-direction: column; }
+        .modal.active { display: flex; }
+        .modal-header { padding: 15px; background: #1f2029; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2a2b36; }
+        .modal-title { font-size: 16px; font-weight: bold; color: #ffd700; }
+        .btn-close { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; }
+        .modal-body { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+
+        /* Shop & Nạp tiền UI */
+        .shop-card { background: #1a1b23; border: 1px solid #2a2b36; border-radius: 10px; padding: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .shop-info h4 { font-size: 14px; color: #fff; }
+        .shop-info p { font-size: 11px; color: #aaa; margin-top: 2px; }
+        .btn-buy { background: #ffa502; color: #000; border: none; padding: 8px 14px; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; }
+        .btn-topup { background: #00e5ff; color: #000; border: none; padding: 8px 14px; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; }
+
+        /* Grid Túi Đồ */
+        .inventory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .item-slot { aspect-ratio: 1; background: #1a1b23; border: 1px solid #2a2b36; border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 24px; position: relative; }
+        .item-lvl { position: absolute; top: 2px; right: 4px; font-size: 10px; color: #2ed573; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div id="mobile-app">
+    <!-- Header -->
+    <header>
+        <div class="user-info">
+            <div class="user-realm" id="txt-realm">Luyện Khí - Tầng 1</div>
+            <div class="currency">
+                <span class="coin">🪙 <span id="txt-coin">0</span></span>
+                <span class="gem">💎 <span id="txt-gem">0</span></span>
+            </div>
+        </div>
+        <div class="bar-group">
+            <div style="display:flex; justify-shadow:space-between;">
+                <span>Sinh Lực (HP)</span>
+                <span id="txt-hp">100/100</span>
+            </div>
+            <div class="progress-bg"><div id="bar-hp" class="progress-fill hp-fill" style="width:100%;"></div></div>
+            <div style="display:flex; justify-content:space-between;">
+                <span>Linh Lực Tu Vi (EXP)</span>
+                <span id="txt-exp">0%</span>
+            </div>
+            <div class="progress-bg"><div id="bar-exp" class="progress-fill exp-fill" style="width:0%;"></div></div>
+        </div>
+    </header>
+
+    <!-- Màn hình chính: Đánh Quái -->
+    <div class="battle-zone">
+        <div class="monster-card">
+            <div class="monster-avatar" id="txt-monster-icon">🦊</div>
+            <div class="monster-name" id="txt-monster-name">Yêu Hồ (Cấp 1)</div>
+            <div class="progress-bg" style="width: 160px; margin: 8px auto;">
+                <div id="bar-monster-hp" class="progress-fill hp-fill" style="width:100%;"></div>
+            </div>
+        </div>
+
+        <div class="action-area">
+            <button class="btn-main btn-attack" onclick="attackMonster()">TRẢM YÊU (TRẢM)</button>
+            <button class="btn-main btn-auto" id="btn-auto-toggle" onclick="toggleAuto()">AUTO: TẮT</button>
+            <div class="log-container" id="log-box"></div>
+        </div>
+    </div>
+
+    <!-- Navigation Dưới Cùng -->
+    <nav>
+        <button class="nav-btn active" onclick="switchTab('battle')">
+            <span class="nav-icon">⚔️</span><span>Trảm Yêu</span>
+        </button>
+        <button class="nav-btn" onclick="openModal('bag')">
+            <span class="nav-icon">🎒</span><span>Túi Đồ</span>
+        </button>
+        <button class="nav-btn" onclick="openModal('shop')">
+            <span class="nav-icon">🏪</span><span>Cửa Hàng</span>
+        </button>
+        <button class="nav-btn" onclick="openModal('topup')">
+            <span class="nav-icon">💳</span><span>Nạp Thẻ</span>
+        </button>
+    </nav>
+
+    <!-- Modal Túi Đồ -->
+    <div class="modal" id="modal-bag">
+        <div class="modal-header">
+            <span class="modal-title">Túi Đồ Trang Bị</span>
+            <button class="btn-close" onclick="closeModal('bag')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div style="display:flex; justify-content:space-between; font-size:13px; color:#aaa; margin-bottom:5px;">
+                <span>Sức mạnh: <b id="txt-atk" style="color:#ff4757">10</b> ATK</span>
+                <span>Chỉ số cộng thêm từ trang bị</span>
+            </div>
+            <div class="inventory-grid" id="bag-grid"></div>
+        </div>
+    </div>
+
+    <!-- Modal Shop Vật Phẩm -->
+    <div class="modal" id="modal-shop">
+        <div class="modal-header">
+            <span class="modal-title">Cửa Hàng Tiên Các</span>
+            <button class="btn-close" onclick="closeModal('shop')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="shop-card">
+                <div class="shop-info">
+                    <h4>⚔️ Thần Binh Ỷ Thiên Kiếm</h4>
+                    <p>Tăng +50 Sát Thương Trảm Yêu</p>
+                </div>
+                <button class="btn-buy" onclick="buyItem('weapon', 100)">100 💎</button>
+            </div>
+            <div class="shop-card">
+                <div class="shop-info">
+                    <h4>🛡️ Khôi Giáp Tiên Môn</h4>
+                    <p>Tăng +300 Máu Tối Đa</p>
+                </div>
+                <button class="btn-buy" onclick="buyItem('armor', 100)">100 💎</button>
+            </div>
+            <div class="shop-card">
+                <div class="shop-info">
+                    <h4>📜 Đan Dược x2 Tu Vi</h4>
+                    <p>Tăng ngay 500 EXP Tu Vi</p>
+                </div>
+                <button class="btn-buy" onclick="buyItem('exp', 50)">50 💎</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Nạp Tiền / Top-up -->
+    <div class="modal" id="modal-topup">
+        <div class="modal-header">
+            <span class="modal-title">Nạp Kim Cương (Nạp Thẻ)</span>
+            <button class="btn-close" onclick="closeModal('topup')">✕</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size:12px; color:#aaa; text-align:center;">Mô phỏng cổng thanh toán Nạp Tiền Dành Cho Người Chơi</p>
+            <div class="shop-card">
+                <div class="shop-info">
+                    <h4>💎 Gói Tiểu Phú</h4>
+                    <p>Nhận ngay 100 Kim Cương</p>
+                </div>
+                <button class="btn-topup" onclick="topup(100, '20.000 VNĐ')">20.000đ</button>
+            </div>
+            <div class="shop-card">
+                <div class="shop-info">
+                    <h4>💎 Gói Đại Phú (VIP)</h4>
+                    <p>Nhận ngay 600 Kim Cương (+20%)</p>
+                </div>
+                <button class="btn-topup" onclick="topup(600, '100.000 VNĐ')">100.000đ</button>
+            </div>
+            <div class="shop-card">
+                <div class="shop-info">
+                    <h4>💎 Gói Chí Tôn</h4>
+                    <p>Nhận ngay 3.500 Kim Cương (+40%)</p>
+                </div>
+                <button class="btn-topup" onclick="topup(3500, '500.000 VNĐ')">500.000đ</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Dữ liệu Lưu Game
+    let p = {
+        realmIdx: 0,
+        exp: 0,
+        maxExp: 100,
+        hp: 100,
+        maxHp: 100,
+        atk: 15,
+        coin: 0,
+        gem: 50,
+        inventory: []
+    };
+
+    const realms = ["Luyện Khí", "Trúc Cơ", "Kim Đan", "Nguyên Anh", "Hóa Thần"];
+    const monsters = [
+        { name: "Yêu Hồ", icon: "🦊", hp: 30, maxHp: 30, exp: 20, coin: 10, atk: 5 },
+        { name: "Mãng Xà", icon: "🐍", hp: 120, maxHp: 120, exp: 60, coin: 35, atk: 15 },
+        { name: "Bạch Hổ", icon: "🐅", hp: 500, maxHp: 500, exp: 200, coin: 120, atk: 40 }
+    ];
+
+    let mIdx = 0;
+    let currM = { ...monsters[0] };
+    let autoInterval = null;
+
+    function init() {
+        loadData();
+        updateUI();
+        renderBag();
+        addLog("Chào mừng Đạo Hữu bước vào con đường Tu Tiên!");
+    }
+
+    function addLog(msg, type="") {
+        const box = document.getElementById('log-box');
+        const div = document.createElement('div');
+        div.className = `log-item ${type}`;
+        div.innerHTML = `> ${msg}`;
+        box.insertBefore(div, box.firstChild);
+    }
+
+    function updateUI() {
+        document.getElementById('txt-realm').innerText = `${realms[p.realmIdx]} - Cấp ${Math.floor(p.exp/50) + 1}`;
+        document.getElementById('txt-coin').innerText = p.coin;
+        document.getElementById('txt-gem').innerText = p.gem;
+        document.getElementById('txt-hp').innerText = `${p.hp}/${p.maxHp}`;
+        document.getElementById('bar-hp').style.width = `${(p.hp/p.maxHp)*100}%`;
+        document.getElementById('txt-exp').innerText = `${Math.floor((p.exp/p.maxExp)*100)}%`;
+        document.getElementById('bar-exp').style.width = `${(p.exp/p.maxExp)*100}%`;
+        document.getElementById('txt-atk').innerText = p.atk;
+
+        // Monster UI
+        document.getElementById('txt-monster-icon').innerText = currM.icon;
+        document.getElementById('txt-monster-name').innerText = `${currM.name}`;
+        document.getElementById('bar-monster-hp').style.width = `${Math.max(0, (currM.hp/currM.maxHp)*100)}%`;
+
+        saveData();
+    }
+
+    function attackMonster() {
+        currM.hp -= p.atk;
+        if (currM.hp <= 0) {
+            addLog(`Trảm diệt <b class="log-gain">${currM.name}</b>! +${currM.exp} Tu Vi, +${currM.coin} Linh Thạch.`, 'log-gain');
+            p.coin += currM.coin;
+            p.exp += currM.exp;
+            
+            if (p.exp >= p.maxExp) {
+                p.exp -= p.maxExp;
+                p.maxExp = Math.floor(p.maxExp * 1.6);
+                p.realmIdx = Math.min(realms.length - 1, p.realmIdx + 1);
+                p.maxHp += 100;
+                p.hp = p.maxHp;
+                p.atk += 20;
+                addLog(`<b>LỘT XÁC THÀNH CÔNG! Đạt cảnh giới ${realms[p.realmIdx]}!</b>`, 'log-item-get');
+                if (mIdx < monsters.length - 1) mIdx++;
+            }
+            currM = { ...monsters[mIdx] };
+        } else {
+            p.hp = Math.max(1, p.hp - Math.max(1, currM.atk - 2));
+        }
+        updateUI();
+    }
+
+    function toggleAuto() {
+        const btn = document.getElementById('btn-auto-toggle');
+        if (autoInterval) {
+            clearInterval(autoInterval);
+            autoInterval = null;
+            btn.innerText = "AUTO: TẮT";
+            btn.style.background = "linear-gradient(135deg, #2ed573, #7bed9f)";
+        } else {
+            autoInterval = setInterval(attackMonster, 600);
+            btn.innerText = "AUTO: ĐANG BẬT";
+            btn.style.background = "linear-gradient(135deg, #ff6b81, #ff4757)";
+        }
+    }
+
+    function openModal(id) { document.getElementById(`modal-${id}`).classList.add('active'); }
+    function closeModal(id) { document.getElementById(`modal-${id}`).classList.remove('active'); }
+
+    function topup(gems, price) {
+        if (confirm(`Xác nhận thanh toán ${price} để nạp ${gems} Kim Cương?`)) {
+            p.gem += gems;
+            addLog(`Nạp thành công ${price}! Nhận <b class="log-item-get">${gems} 💎</b>.`, 'log-item-get');
+            updateUI();
+            alert("Thanh toán thành công!");
+        }
+    }
+
+    function buyItem(type, cost) {
+        if (p.gem < cost) {
+            alert("Không đủ Kim Cương! Hãy vào mục Nạp Thẻ.");
+            return;
+        }
+        p.gem -= cost;
+        if (type === 'weapon') {
+            p.atk += 50;
+            p.inventory.push({ icon: "⚔️", name: "Ỷ Thiên Kiếm" });
+            addLog("Mua thành công Ỷ Thiên Kiếm (+50 ATK)!", "log-item-get");
+        } else if (type === 'armor') {
+            p.maxHp += 300;
+            p.hp += 300;
+            p.inventory.push({ icon: "🛡️", name: "Khôi Giáp Tiên Môn" });
+            addLog("Mua thành công Khôi Giáp Tiên Môn (+300 HP)!", "log-item-get");
+        } else if (type === 'exp') {
+            p.exp += 500;
+            addLog("Sử dụng Đan Dược +500 EXP Tu Vi!", "log-gain");
+        }
+        renderBag();
+        updateUI();
+    }
+
+    function renderBag() {
+        const grid = document.getElementById('bag-grid');
+        grid.innerHTML = '';
+        for(let i=0; i<12; i++) {
+            const slot = document.createElement('div');
+            slot.className = 'item-slot';
+            if (p.inventory[i]) {
+                slot.innerText = p.inventory[i].icon;
+            }
+            grid.appendChild(slot);
+        }
+    }
+
+    function saveData() { localStorage.setItem('tiemkiem_mobile_save', JSON.stringify(p)); }
+    function loadData() {
+        let saved = localStorage.getItem('tiemkiem_mobile_save');
+        if (saved) p = JSON.parse(saved);
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>
