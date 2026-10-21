@@ -10,34 +10,36 @@
         
         #game-wrapper { width: 100%; max-width: 430px; height: 100vh; max-height: 932px; background: #0d0e12; display: flex; flex-direction: column; position: relative; border: 1px solid #2a2b36; overflow: hidden; }
         
-        /* Top Bar HUD */
-        #top-bar { background: linear-gradient(180deg, rgba(20,21,29,0.95), rgba(13,14,18,0.9)); padding: 10px 14px; border-bottom: 1px solid #ffcc0044; display: flex; justify-content: space-between; align-items: center; z-index: 5; }
-        .hud-group { display: flex; gap: 8px; font-size: 11px; font-weight: bold; }
-        .badge { background: #181a22; padding: 4px 8px; border-radius: 10px; border: 1px solid #333; display: flex; align-items: center; gap: 4px; }
+        /* HUD Top Bar */
+        #top-bar { background: linear-gradient(180deg, rgba(20,21,29,0.95), rgba(13,14,18,0.9)); padding: 8px 12px; border-bottom: 1px solid #ffcc0044; display: flex; justify-content: space-between; align-items: center; z-index: 5; }
+        .hud-group { display: flex; gap: 6px; font-size: 11px; font-weight: bold; }
+        .badge { background: #181a22; padding: 3px 8px; border-radius: 10px; border: 1px solid #333; display: flex; align-items: center; gap: 4px; }
         
-        /* Màn hình Canvas Thủ Trụ */
-        #canvas-container { flex: 1; width: 100%; position: relative; background: #131722; display: flex; justify-content: center; align-items: center; }
+        #canvas-container { flex: 1; width: 100%; position: relative; background: #0e111a; display: flex; justify-content: center; align-items: center; }
         canvas { width: 100%; height: 100%; display: block; }
 
-        /* Bảng Điều Khiển Xây Trụ Dưới Cùng */
-        #bottom-panel { position: absolute; bottom: 0; left: 0; width: 100%; z-index: 5; background: linear-gradient(0deg, rgba(13,14,18,0.98) 90%, transparent); padding: 10px; display: flex; flex-direction: column; gap: 8px; }
-        .build-row { display: flex; gap: 8px; justify-content: space-between; }
-        .btn-build { flex: 1; padding: 10px 4px; background: #1f2233; border: 1px solid #ffcc0044; border-radius: 8px; color: #fff; font-size: 11px; font-weight: bold; cursor: pointer; text-align: center; }
+        /* Panel Nâng Cấp Trụ Khi Click */
+        #upgrade-panel { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(20,22,32,0.95); border: 1px solid #ffd700; border-radius: 8px; padding: 8px 14px; display: none; gap: 10px; align-items: center; z-index: 8; }
+        #upgrade-panel button { background: linear-gradient(135deg, #fbc531, #e1b12c); border: none; padding: 6px 12px; border-radius: 5px; font-weight: bold; color: #000; font-size: 11px; cursor: pointer; }
+
+        /* Bottom Controls */
+        #bottom-panel { position: absolute; bottom: 0; left: 0; width: 100%; z-index: 5; background: linear-gradient(0deg, rgba(13,14,18,0.98) 90%, transparent); padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+        .build-row { display: flex; gap: 6px; justify-content: space-between; }
+        .btn-build { flex: 1; padding: 8px 4px; background: #1f2233; border: 1px solid #ffcc0044; border-radius: 8px; color: #fff; font-size: 11px; font-weight: bold; cursor: pointer; text-align: center; }
         .btn-build span { display: block; font-size: 9px; color: #fbc531; margin-top: 2px; }
-        .btn-build:active { background: #2f344a; }
 
         nav { display: flex; justify-content: space-around; background: #14151d; border-top: 1px solid #2a2b36; padding: 6px 0; }
-        .nav-item { background: none; border: none; color: #888; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; width: 25%; }
+        .nav-item { background: none; border: none; color: #888; font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; width: 25%; }
         .nav-item.active { color: #ffd700; font-weight: bold; }
-        .nav-icon { font-size: 18px; }
+        .nav-icon { font-size: 16px; }
 
         /* Modals */
         .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10,10,15,0.96); z-index: 10; display: none; flex-direction: column; }
         .modal-overlay.active { display: flex; }
-        .modal-hdr { padding: 14px; background: #181a24; border-bottom: 1px solid #ffcc0033; display: flex; justify-content: space-between; align-items: center; }
-        .modal-hdr h3 { color: #ffd700; font-size: 15px; }
+        .modal-hdr { padding: 12px; background: #181a24; border-bottom: 1px solid #ffcc0033; display: flex; justify-content: space-between; align-items: center; }
+        .modal-hdr h3 { color: #ffd700; font-size: 14px; }
         .btn-close { background: none; border: none; color: #fff; font-size: 18px; cursor: pointer; }
-        .modal-bdy { flex: 1; padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .modal-bdy { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
 
         .item-card { background: #161822; border: 1px solid #2a2b36; border-radius: 8px; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
         .item-desc h4 { font-size: 13px; color: #fff; }
@@ -49,29 +51,35 @@
 <body>
 
 <div id="game-wrapper">
-    <!-- Top Bar HUD -->
+    <!-- HUD Top Bar -->
     <div id="top-bar">
         <div class="hud-group">
+            <div class="badge">🗺️ <span id="txt-map">Map 1</span></div>
             <div class="badge">❤️ <span id="txt-life">20</span></div>
-            <div class="badge">🌊 Wave <span id="txt-wave">1</span></div>
+            <div class="badge">🌊 Wave <span id="txt-wave">1/5</span></div>
         </div>
         <div class="hud-group">
-            <div class="badge"><span style="color:#fbc531">🪙</span> <span id="txt-gold">150</span></div>
-            <div class="badge"><span style="color:#00a8ff">💎</span> <span id="txt-gem">50</span></div>
+            <div class="badge"><span style="color:#fbc531">🪙</span> <span id="txt-gold">200</span></div>
+            <div class="badge"><span style="color:#00a8ff">💎</span> <span id="txt-gem">100</span></div>
         </div>
     </div>
 
-    <!-- Màn hình Canvas Game Thủ Trụ -->
+    <!-- Canvas Game Screen -->
     <div id="canvas-container">
         <canvas id="gameCanvas"></canvas>
+        <div id="upgrade-panel">
+            <span id="upgrade-info" style="font-size:11px;">Trụ Cấp 1</span>
+            <button onclick="upgradeSelectedTower()">Nâng Cấp (<span id="upgrade-cost">100</span>🪙)</button>
+            <button onclick="closeUpgradePanel()" style="background:#555; color:#fff;">✕</button>
+        </div>
     </div>
 
-    <!-- Bảng Xây Trụ & Điều Hướng -->
+    <!-- Control Build Panel -->
     <div id="bottom-panel">
         <div class="build-row">
-            <button class="btn-build" onclick="selectTowerType('剑', 50)">⚔️ Kiếm Tháp<span>50 Vàng</span></button>
-            <button class="btn-build" onclick="selectTowerType('雷', 80)">⚡ Lôi Trụ<span>80 Vàng</span></button>
-            <button class="btn-build" onclick="selectTowerType('冰', 70)">❄️ Băng Trận<span>70 Vàng</span></button>
+            <button class="btn-build" onclick="selectTowerType('sword', 60)">⚔️ Kiếm Tháp<span>60 Vàng</span></button>
+            <button class="btn-build" onclick="selectTowerType('thunder', 100)">⚡ Lôi Trụ<span>100 Vàng</span></button>
+            <button class="btn-build" onclick="selectTowerType('ice', 90)">❄️ Băng Trận<span>90 Vàng</span></button>
         </div>
         <nav>
             <button class="nav-item active" onclick="closeAllModals()"><span class="nav-icon">🏰</span><span>Thủ Trụ</span></button>
@@ -102,7 +110,7 @@
             <div class="item-card">
                 <div class="item-desc">
                     <h4>⚔️ Thần Binh Ỷ Thiên Kiếm</h4>
-                    <p>Tăng cường sức mạnh toàn bộ Tháp</p>
+                    <p>Tăng +100% Sát Thương toàn bộ Trụ</p>
                 </div>
                 <button class="btn-buy" onclick="buyShopItem(200)">200 💎</button>
             </div>
@@ -118,10 +126,10 @@
         <div class="modal-bdy">
             <div class="item-card">
                 <div class="item-desc">
-                    <h4>💎 Gói Tiên Thạch</h4>
-                    <p>Nhận ngay 200 Kim Cương</p>
+                    <h4>💎 Gói Cấp Tốc</h4>
+                    <p>Nhận ngay 300 Kim Cương</p>
                 </div>
-                <button class="btn-topup" onclick="topup(200, '20.000 VNĐ')">20.000đ</button>
+                <button class="btn-topup" onclick="topup(300, '30.000 VNĐ')">30.000đ</button>
             </div>
         </div>
     </div>
@@ -129,9 +137,43 @@
 
 <script>
     let state = {
-        gold: 150, gem: 50, life: 20, wave: 1,
+        mapIndex: 0,
+        gold: 200, gem: 100, life: 20, wave: 1, maxWave: 5,
         inventory: [], atkBuff: 1
     };
+
+    // Load Sprite Images Mỹ Thuật
+    const images = {};
+    const imgSources = {
+        monster: 'https://cdn-icons-png.flaticon.com/512/3063/3063822.png', // Yêu Thú Quái
+        boss: 'https://cdn-icons-png.flaticon.com/512/1408/1408902.png',    // BOSS Rồng
+        towerSword: 'https://cdn-icons-png.flaticon.com/512/941/941565.png', // Kiếm Tháp
+        towerThunder: 'https://cdn-icons-png.flaticon.com/512/2822/2822366.png', // Lôi Trụ
+        towerIce: 'https://cdn-icons-png.flaticon.com/512/1042/1042456.png' // Băng Trận
+    };
+
+    let loadedCount = 0;
+    for(let key in imgSources) {
+        images[key] = new Image();
+        images[key].src = imgSources[key];
+        images[key].onload = () => { loadedCount++; };
+    }
+
+    // Các Map Địa Hình
+    const maps = [
+        {
+            name: "Tuyệt Tình Sơn (Map 1)",
+            bgColor: "#0f141d",
+            pathColor: "#1d2433",
+            path: [{x:30,y:30},{x:360,y:30},{x:360,y:170},{x:70,y:170},{x:70,y:310},{x:360,y:310},{x:360,y:450},{x:30,y:450}]
+        },
+        {
+            name: "Vạn Kiếp Hỏa Sơn (Map 2)",
+            bgColor: "#1a0d0d",
+            pathColor: "#331a1a",
+            path: [{x:200,y:20},{x:200,y:120},{x:50,y:120},{x:50,y:380},{x:350,y:380},{x:350,y:220},{x:200,y:220},{x:200,y:480}]
+        }
+    ];
 
     let canvas = document.getElementById('gameCanvas');
     let ctx = canvas.getContext('2d');
@@ -143,40 +185,36 @@
     }
     window.addEventListener('resize', resizeCanvas);
 
-    // Đường đi của Yêu Thú (Winding Path)
-    const path = [
-        {x: 40, y: 40}, {x: 350, y: 40},
-        {x: 350, y: 180}, {x: 80, y: 180},
-        {x: 80, y: 320}, {x: 350, y: 320},
-        {x: 350, y: 460}, {x: 40, y: 460}
-    ];
-
     let enemies = [];
     let towers = [];
     let bullets = [];
-    let selectedTowerType = null;
-    let selectedTowerCost = 0;
+    let selectedType = null;
+    let selectedCost = 0;
+    let activeTower = null;
 
     function spawnEnemy() {
+        let currentMap = maps[state.mapIndex];
+        let isBoss = (state.wave === state.maxWave && enemies.length === 0);
+        
         enemies.push({
-            x: path[0].x, y: path[0].y,
+            x: currentMap.path[0].x, y: currentMap.path[0].y,
             pathIndex: 0,
-            hp: 60 + state.wave * 25,
-            maxHp: 60 + state.wave * 25,
-            speed: 1.2 + state.wave * 0.1,
-            radius: 10
+            isBoss: isBoss,
+            hp: isBoss ? (400 + state.wave * 120) : (70 + state.wave * 35),
+            maxHp: isBoss ? (400 + state.wave * 120) : (70 + state.wave * 35),
+            speed: isBoss ? 0.9 : (1.1 + state.wave * 0.08),
+            size: isBoss ? 42 : 28
         });
     }
 
-    // Tự động sinh quái theo đợt
     setInterval(() => {
-        if(enemies.length < 5) spawnEnemy();
-    }, 2500);
+        if(enemies.length < 6) spawnEnemy();
+    }, 2200);
 
     function selectTowerType(type, cost) {
-        selectedTowerType = type;
-        selectedTowerCost = cost;
-        alert(`Đã chọn ${type} Tháp. Chạm lên bản đồ để đặt trụ!`);
+        selectedType = type;
+        selectedCost = cost;
+        alert(`Đã chọn Tháp. Chạm lên ô trống trên bản đồ để đặt!`);
     }
 
     canvas.addEventListener('click', (e) => {
@@ -184,41 +222,82 @@
         let x = e.clientX - rect.left;
         let y = e.clientY - rect.top;
 
-        if(selectedTowerType) {
-            if(state.gold >= selectedTowerCost) {
-                state.gold -= selectedTowerCost;
-                towers.push({ x: x, y: y, type: selectedTowerType, range: 90, cooldown: 0 });
-                selectedTowerType = null;
+        // Kiểm tra click vào trụ sẵn có để Nâng Cấp
+        let clickedTower = towers.find(t => Math.hypot(t.x - x, t.y - y) < 22);
+        if(clickedTower) {
+            activeTower = clickedTower;
+            showUpgradePanel(clickedTower);
+            return;
+        }
+
+        closeUpgradePanel();
+
+        // Đặt trụ mới
+        if(selectedType) {
+            if(state.gold >= selectedCost) {
+                state.gold -= selectedCost;
+                towers.push({ x: x, y: y, type: selectedType, level: 1, range: 95, atk: 25, cooldown: 0 });
+                selectedType = null;
                 updateHUD();
             } else {
-                alert("Không đủ vàng để xây trụ!");
+                alert("Không đủ Vàng!");
             }
         }
     });
 
-    function gameLoop() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    function showUpgradePanel(t) {
+        let panel = document.getElementById('upgrade-panel');
+        document.getElementById('upgrade-info').innerText = `Tháp Cấp ${t.level}`;
+        document.getElementById('upgrade-cost').innerText = t.level * 80;
+        panel.style.display = 'flex';
+    }
 
-        // 1. Vẽ Đường Đi Yêu Thú
-        ctx.strokeStyle = '#23283d';
-        ctx.lineWidth = 28;
+    function closeUpgradePanel() {
+        document.getElementById('upgrade-panel').style.display = 'none';
+        activeTower = null;
+    }
+
+    function upgradeSelectedTower() {
+        if(!activeTower) return;
+        let cost = activeTower.level * 80;
+        if(state.gold >= cost) {
+            state.gold -= cost;
+            activeTower.level++;
+            activeTower.atk += 20;
+            activeTower.range += 10;
+            updateHUD();
+            showUpgradePanel(activeTower);
+            alert("Nâng cấp Tháp thành công!");
+        } else {
+            alert("Không đủ Vàng để nâng cấp!");
+        }
+    }
+
+    function gameLoop() {
+        let currentMap = maps[state.mapIndex];
+        ctx.fillStyle = currentMap.bgColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // 1. Vẽ Đường Đi
+        ctx.strokeStyle = currentMap.pathColor;
+        ctx.lineWidth = 32;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.beginPath();
-        ctx.moveTo(path[0].x, path[0].y);
-        for(let i=1; i<path.length; i++) ctx.lineTo(path[i].x, path[i].y);
+        ctx.moveTo(currentMap.path[0].x, currentMap.path[0].y);
+        for(let i=1; i<currentMap.path.length; i++) ctx.lineTo(currentMap.path[i].x, currentMap.path[i].y);
         ctx.stroke();
 
-        // 2. Cập nhật & Vẽ Yêu Thú
+        // 2. Cập nhật & Vẽ Yêu Thú / BOSS (Hình Sprite)
         for(let i = enemies.length - 1; i >= 0; i--) {
             let en = enemies[i];
-            let target = path[en.pathIndex + 1];
+            let target = currentMap.path[en.pathIndex + 1];
             if(!target) {
                 enemies.splice(i, 1);
                 state.life--;
                 if(state.life <= 0) {
-                    alert("Thủ thành thất bại! Đang reset màn chơi...");
-                    state.life = 20; state.wave = 1; state.gold = 150;
+                    alert("Căn cứ bị phá hủy! Reset chơi lại.");
+                    state.life = 20; state.wave = 1; state.mapIndex = 0;
                 }
                 updateHUD();
                 continue;
@@ -227,70 +306,87 @@
             let dx = target.x - en.x;
             let dy = target.y - en.y;
             let dist = Math.hypot(dx, dy);
-            if(dist < en.speed) {
-                en.pathIndex++;
-            } else {
+            if(dist < en.speed) en.pathIndex++;
+            else {
                 en.x += (dx / dist) * en.speed;
                 en.y += (dy / dist) * en.speed;
             }
 
-            // Vẽ quái
-            ctx.beginPath();
-            ctx.arc(en.x, en.y, en.radius, 0, Math.PI * 2);
-            ctx.fillStyle = '#ff4757';
-            ctx.fill();
+            // Vẽ Sprite hình ảnh Quái/BOSS
+            let img = en.isBoss ? images.boss : images.monster;
+            if(img.complete) {
+                ctx.drawImage(img, en.x - en.size/2, en.y - en.size/2, en.size, en.size);
+            }
 
-            // Thanh máu quái
+            // Thanh Máu
             ctx.fillStyle = '#111';
-            ctx.fillRect(en.x - 14, en.y - 18, 28, 4);
-            ctx.fillStyle = '#2ed573';
-            ctx.fillRect(en.x - 14, en.y - 18, (en.hp / en.maxHp) * 28, 4);
+            ctx.fillRect(en.x - 16, en.y - en.size/2 - 8, 32, 5);
+            ctx.fillStyle = en.isBoss ? '#ffd700' : '#ff4757';
+            ctx.fillRect(en.x - 16, en.y - en.size/2 - 8, (en.hp / en.maxHp) * 32, 5);
         }
 
-        // 3. Cập nhật & Vẽ Trụ Phòng Thủ
+        // 3. Cập nhật & Vẽ Trụ (Hình Sprite)
         towers.forEach(t => {
-            ctx.beginPath();
-            ctx.arc(t.x, t.y, 18, 0, Math.PI * 2);
-            ctx.fillStyle = '#ffcc00';
-            ctx.fill();
-            ctx.fillStyle = '#000';
-            ctx.font = 'bold 12px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText(t.type, t.x, t.y + 4);
+            let imgKey = t.type === 'sword' ? 'towerSword' : (t.type === 'thunder' ? 'towerThunder' : 'towerIce');
+            if(images[imgKey].complete) {
+                ctx.drawImage(images[imgKey], t.x - 18, t.y - 18, 36, 36);
+            }
 
-            // Bắn đạn tìm quái gần nhất
+            // Vòng Cấp Độ Trụ
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 10px Arial';
+            ctx.fillText(`Lv.${t.level}`, t.x - 10, t.y + 26);
+
+            // Tìm quái bắn đạn
             if(t.cooldown > 0) t.cooldown--;
             else {
                 let target = enemies.find(en => Math.hypot(en.x - t.x, en.y - t.y) < t.range);
                 if(target) {
-                    target.hp -= 25 * state.atkBuff;
-                    t.cooldown = 40;
+                    let totalDmg = t.atk * state.atkBuff;
+                    target.hp -= totalDmg;
+                    t.cooldown = Math.max(15, 35 - t.level * 3);
 
-                    // Hiệu ứng tia sét/đạn bắn
                     bullets.push({x1: t.x, y1: t.y, x2: target.x, y2: target.y, alpha: 1.0});
 
                     if(target.hp <= 0) {
-                        state.gold += 20;
-                        // Tỉ lệ rớt đồ VIP 1%
+                        state.gold += target.isBoss ? 100 : 25;
+                        
+                        // TỈ LỆ RỚT ĐỒ VIP 1%
                         if(Math.random() <= 0.01) {
                             state.inventory.push("⚔️ Thần Binh Ỷ Thiên Kiếm (Drop 1%)");
-                            alert("🌟 NHẶT ĐƯỢC THẦN BINH Ỷ THIÊN KIẾM (Tỉ lệ 1%)!");
+                            alert("🌟 BẠN NHẶT ĐƯỢC THẦN BINH Ỷ THIÊN KIẾM (Tỉ lệ 1%)!");
                         }
+
                         let idx = enemies.indexOf(target);
                         if(idx > -1) enemies.splice(idx, 1);
+
+                        // Qua Wave / Qua Map
+                        if(enemies.length === 0) {
+                            state.wave++;
+                            if(state.wave > state.maxWave) {
+                                if(state.mapIndex < maps.length - 1) {
+                                    state.mapIndex++;
+                                    state.wave = 1;
+                                    towers = [];
+                                    alert(`🎉 CHÚC MỪNG QUẢN MÀN! Chuyển sang ${maps[state.mapIndex].name}!`);
+                                } else {
+                                    alert("🏆 CHÚC MỪNG BẠN ĐÃ PHÁ ĐẢO TOÀN BỘ GAME!");
+                                }
+                            }
+                        }
                         updateHUD();
                     }
                 }
             }
         });
 
-        // 4. Vẽ hiệu ứng đạn
+        // 4. Tia Đạn Hiệu Ứng
         for(let i = bullets.length - 1; i >= 0; i--) {
             let b = bullets[i];
             ctx.strokeStyle = '#00a8ff';
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 3;
             ctx.beginPath(); ctx.moveTo(b.x1, b.y1); ctx.lineTo(b.x2, b.y2); ctx.stroke();
-            b.alpha -= 0.1;
+            b.alpha -= 0.15;
             if(b.alpha <= 0) bullets.splice(i, 1);
         }
 
@@ -298,8 +394,9 @@
     }
 
     function updateHUD() {
+        document.getElementById('txt-map').innerText = `Map ${state.mapIndex + 1}`;
         document.getElementById('txt-life').innerText = state.life;
-        document.getElementById('txt-wave').innerText = state.wave;
+        document.getElementById('txt-wave').innerText = `${state.wave}/${state.maxWave}`;
         document.getElementById('txt-gold').innerText = state.gold;
         document.getElementById('txt-gem').innerText = state.gem;
 
@@ -332,10 +429,10 @@
     function buyShopItem(cost) {
         if(state.gem < cost) { alert("Không đủ Kim Cương!"); return; }
         state.gem -= cost;
-        state.atkBuff += 0.5;
+        state.atkBuff += 1.0;
         state.inventory.push("⚔️ Thần Binh Ỷ Thiên Kiếm (Shop)");
         updateHUD();
-        alert("Mua thành công, tăng sát thương tháp!");
+        alert("Mua thành công! +100% Sát thương toàn bộ trụ!");
     }
 
     window.onload = () => {
