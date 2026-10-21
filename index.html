@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tower Defense Mobile - HD Assets</title>
+    <title>Tower Defense Mobile - Standard Version</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
         body { background: #050508; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
@@ -15,19 +15,16 @@
         .hud-group { display: flex; gap: 6px; font-size: 11px; font-weight: bold; }
         .badge { background: #222634; padding: 4px 8px; border-radius: 6px; border: 1px solid #444; display: flex; align-items: center; gap: 4px; }
         
-        #canvas-container { flex: 1; width: 100%; position: relative; background: #1b261b; display: flex; justify-content: center; align-items: center; }
+        #canvas-container { flex: 1; width: 100%; position: relative; background: #1a231a; display: flex; justify-content: center; align-items: center; }
         canvas { width: 100%; height: 100%; display: block; }
 
-        /* Panel Nâng Cấp Toast */
-        #action-toast { position: absolute; bottom: 110px; left: 50%; transform: translateX(-50%); background: rgba(20,24,36,0.96); border: 1px solid #ffd700; border-radius: 8px; padding: 8px 14px; display: none; gap: 12px; align-items: center; z-index: 8; box-shadow: 0 4px 15px rgba(0,0,0,0.8); }
-        #action-toast button { background: #fbc531; border: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; color: #000; font-size: 11px; cursor: pointer; }
+        /* Menu Chọn Trụ / Nâng Cấp Ngay Tại Ô */
+        #spot-menu { position: absolute; bottom: 110px; left: 50%; transform: translateX(-50%); background: rgba(20,24,36,0.98); border: 1px solid #ffd700; border-radius: 10px; padding: 10px 14px; display: none; gap: 10px; align-items: center; z-index: 8; box-shadow: 0 4px 20px rgba(0,0,0,0.8); }
+        .btn-opt { background: #2f354a; border: 1px solid #ffd700; color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .btn-opt span { display: block; font-size: 9px; color: #fbc531; }
 
         /* Bottom Controls */
         #bottom-panel { position: absolute; bottom: 0; left: 0; width: 100%; z-index: 5; background: rgba(18,20,26,0.98); padding: 8px; display: flex; flex-direction: column; gap: 6px; border-top: 1px solid #333; }
-        .build-row { display: flex; gap: 6px; justify-content: space-between; }
-        .btn-build { flex: 1; padding: 8px 4px; background: #232838; border: 1px solid #444; border-radius: 6px; color: #fff; font-size: 11px; font-weight: bold; cursor: pointer; text-align: center; }
-        .btn-build.active-build { border-color: #ffd700; background: #2f354a; }
-        .btn-build span { display: block; font-size: 9px; color: #fbc531; margin-top: 2px; }
 
         nav { display: flex; justify-content: space-around; background: #13151d; padding: 6px 0; }
         .nav-item { background: none; border: none; color: #888; font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; width: 25%; }
@@ -60,7 +57,7 @@
             <div class="badge">🌊 Wave <span id="txt-wave">1/5</span></div>
         </div>
         <div class="hud-group">
-            <div class="badge"><span style="color:#fbc531">🪙</span> <span id="txt-gold">250</span></div>
+            <div class="badge"><span style="color:#fbc531">🪙</span> <span id="txt-gold">300</span></div>
             <div class="badge"><span style="color:#00a8ff">💎</span> <span id="txt-gem">100</span></div>
         </div>
     </div>
@@ -68,22 +65,26 @@
     <!-- Canvas Game -->
     <div id="canvas-container">
         <canvas id="gameCanvas"></canvas>
-        <div id="action-toast">
-            <span id="toast-text" style="font-size:11px; color:#ffd700;">Pháo Đài (Lv.1)</span>
-            <button onclick="upgradeActiveTower()">Nâng cấp (<span id="toast-cost">70</span>🪙)</button>
-            <button onclick="hideToast()" style="background:#555; color:#fff;">✕</button>
+        
+        <!-- UI Chọn Xây / Nâng Cấp Trụ Tại Ô Cố Định -->
+        <div id="spot-menu">
+            <div id="build-opts" style="display:flex; gap:8px;">
+                <button class="btn-opt" onclick="buildTower('cannon', 60)">💣 Pháo Thần<span>60🪙</span></button>
+                <button class="btn-opt" onclick="buildTower('laser', 100)">⚡ Lôi Trụ<span>100🪙</span></button>
+                <button class="btn-opt" onclick="buildTower('missile', 130)">🚀 Tên Lửa<span>130🪙</span></button>
+            </div>
+            <div id="upgrade-opts" style="display:none; gap:8px; align-items:center;">
+                <span id="txt-tower-info" style="font-size:11px; color:#ffd700;">Trụ Lv.1</span>
+                <button class="btn-opt" style="background:#fbc531; color:#000;" onclick="upgradeTower()">Nâng cấp (<span id="txt-up-cost">80</span>🪙)</button>
+            </div>
+            <button onclick="hideMenu()" style="background:#444; border:none; color:#fff; padding:6px 10px; border-radius:6px; font-weight:bold;">✕</button>
         </div>
     </div>
 
     <!-- Bottom Controls -->
     <div id="bottom-panel">
-        <div class="build-row">
-            <button class="btn-build" id="btn-s1" onclick="selectBuild('cannon', 60)">💣 Pháo Thần Công<span>60 Vàng</span></button>
-            <button class="btn-build" id="btn-s2" onclick="selectBuild('laser', 100)">⚡ Trụ Lôi Điện<span>100 Vàng</span></button>
-            <button class="btn-build" id="btn-s3" onclick="selectBuild('missile', 130)">🚀 Trụ Tên Lửa<span>130 Vàng</span></button>
-        </div>
         <nav>
-            <button class="nav-item active" onclick="closeAllModals()"><span class="nav-icon">⚔️</span><span>Chiến Trường</span></button>
+            <button class="nav-item active" onclick="closeAllModals()"><span class="nav-icon">🏰</span><span>Chiến Trường</span></button>
             <button class="nav-item" onclick="openModal('bag')"><span class="nav-icon">🎒</span><span>Túi Đồ</span></button>
             <button class="nav-item" onclick="openModal('shop')"><span class="nav-icon">🏪</span><span>Cửa Hàng</span></button>
             <button class="nav-item" onclick="openModal('topup')"><span class="nav-icon">💳</span><span>Nạp Thẻ</span></button>
@@ -97,7 +98,7 @@
             <button class="btn-close" onclick="closeAllModals()">✕</button>
         </div>
         <div class="modal-bdy" id="bag-list">
-            <p style="font-size:11px; color:#888; text-align:center;">Tiêu diệt xe địch nhận trang bị hiếm.</p>
+            <p style="font-size:11px; color:#888; text-align:center;">Tiêu diệt quái nhận trang bị hiếm.</p>
         </div>
     </div>
 
@@ -139,314 +140,13 @@
 <script>
     let state = {
         mapIndex: 0,
-        gold: 250, gem: 100, life: 20, wave: 1, maxWave: 5,
+        gold: 300, gem: 100, life: 20, wave: 1, maxWave: 5,
         inventory: [], atkBuff: 1
     };
 
-    // BỘ ASSET HÌNH ẢNH GAME MOBILE HD (PNG Trong Suốt)
-    const assets = {};
-    const assetURLs = {
-        tank: 'https://api.iconify.design/game-icons:tank.svg?color=%2338a169',
-        bossTank: 'https://api.iconify.design/game-icons:tank.svg?color=%23e53e3e',
-        towerCannon: 'https://api.iconify.design/game-icons:cannon.svg?color=%23ecc94b',
-        towerLaser: 'https://api.iconify.design/game-icons:lightning-trio.svg?color=%233182ce',
-        towerMissile: 'https://api.iconify.design/game-icons:rocket.svg?color=%23e53e3e'
-    };
-
-    for(let k in assetURLs) {
-        assets[k] = new Image();
-        assets[k].src = assetURLs[k];
-    }
-
+    // Các Cửa Ải Bản Đồ Kèm Vị Trí Ô Đặt Trụ Cố Định (Plaza Tiles)
     const maps = [
         {
-            name: "Đồi Xanh Map 1",
-            bgColor: "#1b261b",
-            pathColor: "#334155",
-            path: [{x:30,y:40},{x:360,y:40},{x:360,y:170},{x:70,y:170},{x:70,y:300},{x:360,y:300},{x:360,y:430},{x:30,y:430}]
-        },
-        {
-            name: "Sa Mạc Map 2",
-            bgColor: "#2d2013",
-            pathColor: "#4a3b2c",
-            path: [{x:200,y:20},{x:200,y:120},{x:50,y:120},{x:50,y:280},{x:350,y:280},{x:350,y:420},{x:50,y:420}]
-        }
-    ];
-
-    let canvas = document.getElementById('gameCanvas');
-    let ctx = canvas.getContext('2d');
-
-    function resizeCanvas() {
-        let container = document.getElementById('canvas-container');
-        canvas.width = container.clientWidth;
-        canvas.height = container.clientHeight;
-    }
-    window.addEventListener('resize', resizeCanvas);
-
-    let enemies = [];
-    let towers = [];
-    let effects = [];
-    let selectedType = null;
-    let selectedCost = 0;
-    let activeTower = null;
-
-    function spawnEnemy() {
-        let currentMap = maps[state.mapIndex];
-        let isBoss = (state.wave === state.maxWave && enemies.length === 0);
-        enemies.push({
-            x: currentMap.path[0].x, y: currentMap.path[0].y,
-            pathIndex: 0,
-            isBoss: isBoss,
-            hp: isBoss ? (700 + state.mapIndex * 500) : (100 + state.wave * 40 + state.mapIndex * 150),
-            maxHp: isBoss ? (700 + state.mapIndex * 500) : (100 + state.wave * 40 + state.mapIndex * 150),
-            speed: isBoss ? 0.7 : (1.0 + state.wave * 0.08),
-            size: isBoss ? 32 : 22
-        });
-    }
-
-    setInterval(() => {
-        if(enemies.length < 5) spawnEnemy();
-    }, 2000);
-
-    function selectBuild(type, cost) {
-        selectedType = type;
-        selectedCost = cost;
-        document.querySelectorAll('.btn-build').forEach(b => b.classList.remove('active-build'));
-        if(type === 'cannon') document.getElementById('btn-s1').classList.add('active-build');
-        if(type === 'laser') document.getElementById('btn-s2').classList.add('active-build');
-        if(type === 'missile') document.getElementById('btn-s3').classList.add('active-build');
-    }
-
-    canvas.addEventListener('click', (e) => {
-        let rect = canvas.getBoundingClientRect();
-        let x = e.clientX - rect.left;
-        let y = e.clientY - rect.top;
-
-        let clicked = towers.find(t => Math.hypot(t.x - x, t.y - y) < 24);
-        if(clicked) {
-            activeTower = clicked;
-            showToast(clicked);
-            return;
-        }
-
-        hideToast();
-
-        if(selectedType) {
-            if(state.gold >= selectedCost) {
-                state.gold -= selectedCost;
-                towers.push({ x: x, y: y, type: selectedType, level: 1, range: 105, atk: 35, cooldown: 0 });
-                updateHUD();
-            }
-        }
-    });
-
-    function showToast(t) {
-        activeTower = t;
-        let toast = document.getElementById('action-toast');
-        document.getElementById('toast-text').innerText = `Trụ ${t.type.toUpperCase()} (Lv.${t.level})`;
-        document.getElementById('toast-cost').innerText = t.level * 60;
-        toast.style.display = 'flex';
-    }
-
-    function hideToast() {
-        document.getElementById('action-toast').style.display = 'none';
-        activeTower = null;
-    }
-
-    function upgradeActiveTower() {
-        if(!activeTower) return;
-        let cost = activeTower.level * 60;
-        if(state.gold >= cost) {
-            state.gold -= cost;
-            activeTower.level++;
-            activeTower.atk += 25;
-            activeTower.range += 10;
-            updateHUD();
-            showToast(activeTower);
-        }
-    }
-
-    function gameLoop() {
-        let currentMap = maps[state.mapIndex];
-        ctx.fillStyle = currentMap.bgColor;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // 1. Vẽ Đường Đi
-        ctx.strokeStyle = currentMap.pathColor;
-        ctx.lineWidth = 32;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.beginPath();
-        ctx.moveTo(currentMap.path[0].x, currentMap.path[0].y);
-        for(let i=1; i<currentMap.path.length; i++) ctx.lineTo(currentMap.path[i].x, currentMap.path[i].y);
-        ctx.stroke();
-
-        // 2. Cập nhật & Vẽ Xe Tăng Địch (Hình Đồ Họa HD)
-        for(let i = enemies.length - 1; i >= 0; i--) {
-            let en = enemies[i];
-            let target = currentMap.path[en.pathIndex + 1];
-            if(!target) {
-                enemies.splice(i, 1);
-                state.life--;
-                if(state.life <= 0) {
-                    state.life = 20; state.wave = 1; state.gold = 250; towers = [];
-                }
-                updateHUD();
-                continue;
-            }
-
-            let dx = target.x - en.x;
-            let dy = target.y - en.y;
-            let dist = Math.hypot(dx, dy);
-            if(dist < en.speed) en.pathIndex++;
-            else {
-                en.x += (dx / dist) * en.speed;
-                en.y += (dy / dist) * en.speed;
-            }
-
-            // Vẽ Hình Ảnh Đồ Họa Địch
-            let img = en.isBoss ? assets.bossTank : assets.tank;
-            if(img.complete) {
-                ctx.drawImage(img, en.x - en.size/2, en.y - en.size/2, en.size, en.size);
-            }
-
-            // Thanh máu
-            ctx.fillStyle = '#111';
-            ctx.fillRect(en.x - 16, en.y - en.size/2 - 8, 32, 5);
-            ctx.fillStyle = en.isBoss ? '#ffd700' : '#e53e3e';
-            ctx.fillRect(en.x - 16, en.y - en.size/2 - 8, (en.hp / en.maxHp) * 32, 5);
-        }
-
-        // 3. Cập nhật & Vẽ Trụ Phòng Thủ (Hình Đồ Họa HD)
-        towers.forEach(t => {
-            // Đáy bệ trụ
-            ctx.beginPath();
-            ctx.arc(t.x, t.y, 18, 0, Math.PI * 2);
-            ctx.fillStyle = '#2d3748';
-            ctx.fill();
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = '#ecc94b';
-            ctx.stroke();
-
-            // Vẽ Hình Ảnh Trụ HD
-            let tImg = t.type === 'cannon' ? assets.towerCannon : (t.type === 'laser' ? assets.towerLaser : assets.towerMissile);
-            if(tImg.complete) {
-                ctx.drawImage(tImg, t.x - 14, t.y - 14, 28, 28);
-            }
-
-            // Cấp độ
-            ctx.fillStyle = '#ecc94b';
-            ctx.font = 'bold 10px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText(`Lv.${t.level}`, t.x, t.y + 26);
-
-            if(t.cooldown > 0) t.cooldown--;
-            else {
-                let target = enemies.find(en => Math.hypot(en.x - t.x, en.y - t.y) < t.range);
-                if(target) {
-                    let isCrit = Math.random() < 0.25;
-                    let dmg = t.atk * state.atkBuff * (isCrit ? 2 : 1);
-                    target.hp -= dmg;
-                    t.cooldown = Math.max(10, 26 - t.level * 2);
-
-                    effects.push({
-                        x1: t.x, y1: t.y, x2: target.x, y2: target.y,
-                        alpha: 1.0, crit: isCrit, color: t.type === 'laser' ? '#3182ce' : '#ecc94b'
-                    });
-
-                    if(target.hp <= 0) {
-                        state.gold += target.isBoss ? 150 : 30;
-                        
-                        if(Math.random() <= 0.01) {
-                            state.inventory.push("🛡️ Giáp Chiến Trường (Drop 1%)");
-                        }
-
-                        let idx = enemies.indexOf(target);
-                        if(idx > -1) enemies.splice(idx, 1);
-
-                        if(enemies.length === 0) {
-                            state.wave++;
-                            // CHUYỂN MAP & RESET TRỤ CŨ
-                            if(state.wave > state.maxWave) {
-                                if(state.mapIndex < maps.length - 1) {
-                                    state.mapIndex++;
-                                    state.wave = 1;
-                                    towers = []; // RE-SET LÀM MỚI TOÀN BỘ TRỤ
-                                    alert(`🎉 BẠN ĐÃ QUA MAP 1! Chuyển sang ${maps[state.mapIndex].name}. Toàn bộ trụ đã được reset để chuẩn bị cho trận chiến khó hơn!`);
-                                } else {
-                                    alert("🏆 BẠN ĐÃ THÔNG QUAN BẢN ĐỒ TOÀN BỘ GAME!");
-                                }
-                            }
-                        }
-                        updateHUD();
-                    }
-                }
-            }
-        });
-
-        // 4. Hiệu ứng đạn & CRITICAL
-        for(let i = effects.length - 1; i >= 0; i--) {
-            let ef = effects[i];
-            ctx.strokeStyle = ef.color;
-            ctx.lineWidth = 3;
-            ctx.beginPath(); ctx.moveTo(ef.x1, ef.y1); ctx.lineTo(ef.x2, ef.y2); ctx.stroke();
-
-            if(ef.crit) {
-                ctx.fillStyle = '#e53e3e';
-                ctx.font = 'bold 12px Arial';
-                ctx.fillText("CRITICAL!", ef.x2, ef.y2 - 12);
-            }
-
-            ef.alpha -= 0.25;
-            if(ef.alpha <= 0) effects.splice(i, 1);
-        }
-
-        requestAnimationFrame(gameLoop);
-    }
-
-    function updateHUD() {
-        document.getElementById('txt-map').innerText = `Map ${state.mapIndex + 1}`;
-        document.getElementById('txt-life').innerText = state.life;
-        document.getElementById('txt-wave').innerText = `${state.wave}/${state.maxWave}`;
-        document.getElementById('txt-gold').innerText = state.gold;
-        document.getElementById('txt-gem').innerText = state.gem;
-
-        let bagList = document.getElementById('bag-list');
-        bagList.innerHTML = `<p style="font-size:11px; color:#888; text-align:center;">Trang bị nhận từ chiến trường.</p>`;
-        state.inventory.forEach(item => {
-            let div = document.createElement('div');
-            div.className = 'item-card';
-            div.innerHTML = `<div class="item-desc"><h4>${item}</h4></div>`;
-            bagList.appendChild(div);
-        });
-    }
-
-    function openModal(id) {
-        closeAllModals();
-        document.getElementById(`modal-${id}`).classList.add('active');
-    }
-    function closeAllModals() {
-        document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
-    }
-
-    function topup(gems, price) {
-        state.gem += gems;
-        updateHUD();
-    }
-
-    function buyShop(cost) {
-        if(state.gem < cost) return;
-        state.gem -= cost;
-        state.atkBuff += 1.0;
-        state.inventory.push("🔥 Lõi Năng Lượng (Shop)");
-        updateHUD();
-    }
-
-    window.onload = () => {
-        resizeCanvas();
-        updateHUD();
-        gameLoop();
-    };
-</script>
-</body>
-</html>
+            name: "Tuyệt Tình Sơn (Map 1)",
+            bgColor: "#1a2a1a",
+            pathColor: "#334
