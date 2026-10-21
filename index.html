@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tiên Nghịch Mobile - Tu Tiên AFK</title>
+    <title>Tiên Hiệp Thủ Trụ - Tower Defense Mobile</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
         body { background: #050508; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
@@ -11,49 +11,39 @@
         #game-wrapper { width: 100%; max-width: 430px; height: 100vh; max-height: 932px; background: #0d0e12; display: flex; flex-direction: column; position: relative; border: 1px solid #2a2b36; overflow: hidden; }
         
         /* Top Bar HUD */
-        #top-bar { background: linear-gradient(180deg, rgba(20,21,29,0.95), rgba(13,14,18,0.9)); padding: 12px 14px; border-bottom: 1px solid #ffcc0044; display: flex; flex-direction: column; gap: 8px; z-index: 5; }
-        .user-header { display: flex; justify-content: space-between; align-items: center; }
-        .realm-title { font-weight: bold; color: #ffd700; font-size: 15px; text-shadow: 0 0 8px rgba(255,215,0,0.5); }
-        .currency-group { display: flex; gap: 8px; font-size: 12px; font-weight: bold; }
-        .badge { background: #181a22; padding: 4px 10px; border-radius: 12px; border: 1px solid #333; display: flex; align-items: center; gap: 4px; }
+        #top-bar { background: linear-gradient(180deg, rgba(20,21,29,0.95), rgba(13,14,18,0.9)); padding: 10px 14px; border-bottom: 1px solid #ffcc0044; display: flex; justify-content: space-between; align-items: center; z-index: 5; }
+        .hud-group { display: flex; gap: 8px; font-size: 11px; font-weight: bold; }
+        .badge { background: #181a22; padding: 4px 8px; border-radius: 10px; border: 1px solid #333; display: flex; align-items: center; gap: 4px; }
         
-        .bar-container { display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: #aaa; }
-        .progress-track { width: 100%; height: 8px; background: #1a1a22; border-radius: 4px; overflow: hidden; border: 1px solid #333; }
-        .progress-fill { height: 100%; transition: width 0.2s; }
-        .hp-bar { background: linear-gradient(90deg, #ff4757, #ff6b81); }
-        .exp-bar { background: linear-gradient(90deg, #ffa502, #ffdd59); }
-
-        /* Màn hình Đồ Hoạ Canvas Game */
-        #canvas-container { flex: 1; width: 100%; position: relative; display: flex; justify-content: center; align-items: center; background: #0b0c10; }
+        /* Màn hình Canvas Thủ Trụ */
+        #canvas-container { flex: 1; width: 100%; position: relative; background: #131722; display: flex; justify-content: center; align-items: center; }
         canvas { width: 100%; height: 100%; display: block; }
 
-        /* Controls Dưới Cùng */
-        #bottom-panel { position: absolute; bottom: 0; left: 0; width: 100%; z-index: 5; background: linear-gradient(0deg, rgba(13,14,18,0.98) 85%, transparent); padding: 10px; display: flex; flex-direction: column; gap: 10px; }
-        .action-row { display: flex; gap: 10px; }
-        .btn-game { flex: 1; padding: 14px; border: none; border-radius: 10px; font-weight: bold; font-size: 15px; cursor: pointer; text-shadow: 0 1px 2px #000; transition: transform 0.1s; }
-        .btn-game:active { transform: scale(0.96); }
-        .btn-skill { background: linear-gradient(135deg, #ff4757, #e84118); color: #fff; box-shadow: 0 4px 12px rgba(232, 65, 24, 0.4); }
-        .btn-auto { background: linear-gradient(135deg, #2ed573, #26af5f); color: #fff; }
-        .btn-auto.active { background: linear-gradient(135deg, #ffa502, #e1b12c); }
+        /* Bảng Điều Khiển Xây Trụ Dưới Cùng */
+        #bottom-panel { position: absolute; bottom: 0; left: 0; width: 100%; z-index: 5; background: linear-gradient(0deg, rgba(13,14,18,0.98) 90%, transparent); padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+        .build-row { display: flex; gap: 8px; justify-content: space-between; }
+        .btn-build { flex: 1; padding: 10px 4px; background: #1f2233; border: 1px solid #ffcc0044; border-radius: 8px; color: #fff; font-size: 11px; font-weight: bold; cursor: pointer; text-align: center; }
+        .btn-build span { display: block; font-size: 9px; color: #fbc531; margin-top: 2px; }
+        .btn-build:active { background: #2f344a; }
 
-        nav { display: flex; justify-content: space-around; background: #14151d; border-top: 1px solid #2a2b36; padding: 8px 0; }
-        .nav-item { background: none; border: none; color: #888; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; width: 25%; }
+        nav { display: flex; justify-content: space-around; background: #14151d; border-top: 1px solid #2a2b36; padding: 6px 0; }
+        .nav-item { background: none; border: none; color: #888; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; width: 25%; }
         .nav-item.active { color: #ffd700; font-weight: bold; }
-        .nav-icon { font-size: 20px; }
+        .nav-icon { font-size: 18px; }
 
         /* Modals */
         .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10,10,15,0.96); z-index: 10; display: none; flex-direction: column; }
         .modal-overlay.active { display: flex; }
         .modal-hdr { padding: 14px; background: #181a24; border-bottom: 1px solid #ffcc0033; display: flex; justify-content: space-between; align-items: center; }
-        .modal-hdr h3 { color: #ffd700; font-size: 16px; }
-        .btn-close { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; }
-        .modal-bdy { flex: 1; padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .modal-hdr h3 { color: #ffd700; font-size: 15px; }
+        .btn-close { background: none; border: none; color: #fff; font-size: 18px; cursor: pointer; }
+        .modal-bdy { flex: 1; padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
 
-        .item-card { background: #161822; border: 1px solid #2a2b36; border-radius: 10px; padding: 12px; display: flex; justify-content: space-between; align-items: center; }
-        .item-desc h4 { font-size: 14px; color: #fff; }
-        .item-desc p { font-size: 11px; color: #aaa; margin-top: 3px; }
-        .btn-buy { background: #fbc531; color: #000; border: none; padding: 8px 14px; border-radius: 6px; font-weight: bold; font-size: 12px; }
-        .btn-topup { background: #00a8ff; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; font-weight: bold; font-size: 12px; }
+        .item-card { background: #161822; border: 1px solid #2a2b36; border-radius: 8px; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .item-desc h4 { font-size: 13px; color: #fff; }
+        .item-desc p { font-size: 10px; color: #aaa; margin-top: 2px; }
+        .btn-buy { background: #fbc531; color: #000; border: none; padding: 6px 12px; border-radius: 5px; font-weight: bold; font-size: 11px; }
+        .btn-topup { background: #00a8ff; color: #fff; border: none; padding: 6px 12px; border-radius: 5px; font-weight: bold; font-size: 11px; }
     </style>
 </head>
 <body>
@@ -61,40 +51,30 @@
 <div id="game-wrapper">
     <!-- Top Bar HUD -->
     <div id="top-bar">
-        <div class="user-header">
-            <div class="realm-title" id="txt-realm">Tiên Nhân - Cảnh Giới 1</div>
-            <div class="currency-group">
-                <div class="badge"><span style="color:#fbc531">🪙</span> <span id="txt-gold">500</span></div>
-                <div class="badge"><span style="color:#00a8ff">💎</span> <span id="txt-gem">100</span></div>
-            </div>
+        <div class="hud-group">
+            <div class="badge">❤️ <span id="txt-life">20</span></div>
+            <div class="badge">🌊 Wave <span id="txt-wave">1</span></div>
         </div>
-        <div class="bar-container">
-            <div style="display:flex; justify-content:space-between;">
-                <span>Sinh Lực (HP)</span>
-                <span id="txt-hp-num">100/100</span>
-            </div>
-            <div class="progress-track"><div id="bar-hp" class="progress-fill hp-bar" style="width:100%;"></div></div>
-            <div style="display:flex; justify-content:space-between;">
-                <span>Tu Vi (EXP)</span>
-                <span id="txt-exp-num">0%</span>
-            </div>
-            <div class="progress-track"><div id="bar-exp" class="progress-fill exp-bar" style="width:0%;"></div></div>
+        <div class="hud-group">
+            <div class="badge"><span style="color:#fbc531">🪙</span> <span id="txt-gold">150</span></div>
+            <div class="badge"><span style="color:#00a8ff">💎</span> <span id="txt-gem">50</span></div>
         </div>
     </div>
 
-    <!-- Màn hình Đồ Họa Canvas -->
+    <!-- Màn hình Canvas Game Thủ Trụ -->
     <div id="canvas-container">
         <canvas id="gameCanvas"></canvas>
     </div>
 
-    <!-- Bảng Điều Khiển Dưới Cùng -->
+    <!-- Bảng Xây Trụ & Điều Hướng -->
     <div id="bottom-panel">
-        <div class="action-row">
-            <button class="btn-game btn-skill" onclick="playerSkill()">THIỆN ĐỊA TRẢM</button>
-            <button class="btn-game btn-auto" id="btn-auto-toggle" onclick="toggleAuto()">TREO MÁY: TẮT</button>
+        <div class="build-row">
+            <button class="btn-build" onclick="selectTowerType('剑', 50)">⚔️ Kiếm Tháp<span>50 Vàng</span></button>
+            <button class="btn-build" onclick="selectTowerType('雷', 80)">⚡ Lôi Trụ<span>80 Vàng</span></button>
+            <button class="btn-build" onclick="selectTowerType('冰', 70)">❄️ Băng Trận<span>70 Vàng</span></button>
         </div>
         <nav>
-            <button class="nav-item active" onclick="closeAllModals()"><span class="nav-icon">⚔️</span><span>Chiến Đấu</span></button>
+            <button class="nav-item active" onclick="closeAllModals()"><span class="nav-icon">🏰</span><span>Thủ Trụ</span></button>
             <button class="nav-item" onclick="openModal('bag')"><span class="nav-icon">🎒</span><span>Túi Đồ</span></button>
             <button class="nav-item" onclick="openModal('shop')"><span class="nav-icon">🏪</span><span>Cửa Hàng</span></button>
             <button class="nav-item" onclick="openModal('topup')"><span class="nav-icon">💳</span><span>Nạp Thẻ</span></button>
@@ -104,11 +84,11 @@
     <!-- Modal Túi Đồ -->
     <div class="modal-overlay" id="modal-bag">
         <div class="modal-hdr">
-            <h3>Túi Đồ Trang Bị</h3>
+            <h3>Túi Đồ Trang Bị (Drop 1%)</h3>
             <button class="btn-close" onclick="closeAllModals()">✕</button>
         </div>
         <div class="modal-bdy" id="bag-list">
-            <p style="font-size:12px; color:#888; text-align:center;">Trang bị nhặt được từ tiêu diệt Yêu Thú.</p>
+            <p style="font-size:11px; color:#888; text-align:center;">Tiêu diệt Yêu Thú nhận trang bị hiếm.</p>
         </div>
     </div>
 
@@ -122,16 +102,9 @@
             <div class="item-card">
                 <div class="item-desc">
                     <h4>⚔️ Thần Binh Ỷ Thiên Kiếm</h4>
-                    <p>Tăng +150 Sát Thương Trảm Yêu</p>
+                    <p>Tăng cường sức mạnh toàn bộ Tháp</p>
                 </div>
-                <button class="btn-buy" onclick="buyShopItem('weapon', 200)">200 💎</button>
-            </div>
-            <div class="item-card">
-                <div class="item-desc">
-                    <h4>🛡️ Hoàng Kim Giáp</h4>
-                    <p>Tăng +800 Máu Tối Đa</p>
-                </div>
-                <button class="btn-buy" onclick="buyShopItem('armor', 200)">200 💎</button>
+                <button class="btn-buy" onclick="buyShopItem(200)">200 💎</button>
             </div>
         </div>
     </div>
@@ -139,23 +112,16 @@
     <!-- Modal Nạp Thẻ -->
     <div class="modal-overlay" id="modal-topup">
         <div class="modal-hdr">
-            <h3>Nạp Kim Cương (Nạp Thẻ)</h3>
+            <h3>Nạp Kim Cương</h3>
             <button class="btn-close" onclick="closeAllModals()">✕</button>
         </div>
         <div class="modal-bdy">
             <div class="item-card">
                 <div class="item-desc">
-                    <h4>💎 Gói Tiên Thạch Nhỏ</h4>
+                    <h4>💎 Gói Tiên Thạch</h4>
                     <p>Nhận ngay 200 Kim Cương</p>
                 </div>
                 <button class="btn-topup" onclick="topup(200, '20.000 VNĐ')">20.000đ</button>
-            </div>
-            <div class="item-card">
-                <div class="item-desc">
-                    <h4>💎 Gói Trưởng Thành (VIP)</h4>
-                    <p>Nhận ngay 1.200 Kim Cương (+20%)</p>
-                </div>
-                <button class="btn-topup" onclick="topup(1200, '100.000 VNĐ')">100.000đ</button>
             </div>
         </div>
     </div>
@@ -163,17 +129,12 @@
 
 <script>
     let state = {
-        level: 1, exp: 0, maxExp: 100,
-        hp: 100, maxHp: 100, atk: 25,
-        gold: 500, gem: 100,
-        inventory: [],
-        auto: false
+        gold: 150, gem: 50, life: 20, wave: 1,
+        inventory: [], atkBuff: 1
     };
 
     let canvas = document.getElementById('gameCanvas');
     let ctx = canvas.getContext('2d');
-    let fxList = [];
-    let dmgTexts = [];
 
     function resizeCanvas() {
         let container = document.getElementById('canvas-container');
@@ -182,181 +143,168 @@
     }
     window.addEventListener('resize', resizeCanvas);
 
-    let monster = { x: 0, y: 0, hp: 100, maxHp: 100, name: "Cổ Đại Yêu Thú" };
-    let player = { x: 0, y: 0 };
+    // Đường đi của Yêu Thú (Winding Path)
+    const path = [
+        {x: 40, y: 40}, {x: 350, y: 40},
+        {x: 350, y: 180}, {x: 80, y: 180},
+        {x: 80, y: 320}, {x: 350, y: 320},
+        {x: 350, y: 460}, {x: 40, y: 460}
+    ];
 
-    function initGame() {
-        resizeCanvas();
-        player.x = canvas.width / 2;
-        player.y = canvas.height * 0.72;
-        monster.x = canvas.width / 2;
-        monster.y = canvas.height * 0.32;
-        requestAnimationFrame(gameLoop);
+    let enemies = [];
+    let towers = [];
+    let bullets = [];
+    let selectedTowerType = null;
+    let selectedTowerCost = 0;
+
+    function spawnEnemy() {
+        enemies.push({
+            x: path[0].x, y: path[0].y,
+            pathIndex: 0,
+            hp: 60 + state.wave * 25,
+            maxHp: 60 + state.wave * 25,
+            speed: 1.2 + state.wave * 0.1,
+            radius: 10
+        });
     }
 
-    let angle = 0;
+    // Tự động sinh quái theo đợt
+    setInterval(() => {
+        if(enemies.length < 5) spawnEnemy();
+    }, 2500);
+
+    function selectTowerType(type, cost) {
+        selectedTowerType = type;
+        selectedTowerCost = cost;
+        alert(`Đã chọn ${type} Tháp. Chạm lên bản đồ để đặt trụ!`);
+    }
+
+    canvas.addEventListener('click', (e) => {
+        let rect = canvas.getBoundingClientRect();
+        let x = e.clientX - rect.left;
+        let y = e.clientY - rect.top;
+
+        if(selectedTowerType) {
+            if(state.gold >= selectedTowerCost) {
+                state.gold -= selectedTowerCost;
+                towers.push({ x: x, y: y, type: selectedTowerType, range: 90, cooldown: 0 });
+                selectedTowerType = null;
+                updateHUD();
+            } else {
+                alert("Không đủ vàng để xây trụ!");
+            }
+        }
+    });
+
     function gameLoop() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // 1. Vẽ Bản Đồ Lưới Tiên Vực
-        ctx.strokeStyle = '#1a1d2e';
-        ctx.lineWidth = 1;
-        for(let x=0; x<canvas.width; x+=30) {
-            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
-        }
-        for(let y=0; y<canvas.height; y+=30) {
-            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
-        }
-
-        // 2. Vẽ Nhân Vật Hero (Xanh) + Vòng Hào Quang
-        angle += 0.03;
-        ctx.save();
+        // 1. Vẽ Đường Đi Yêu Thú
+        ctx.strokeStyle = '#23283d';
+        ctx.lineWidth = 28;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
         ctx.beginPath();
-        ctx.arc(player.x, player.y, 28, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(0, 168, 255, 0.2)';
-        ctx.fill();
-        ctx.strokeStyle = '#00a8ff';
-        ctx.lineWidth = 2;
-        ctx.setLineDash([6, 6]);
-        ctx.stroke();
-        ctx.restore();
-
-        ctx.beginPath();
-        ctx.arc(player.x, player.y, 18, 0, Math.PI * 2);
-        ctx.fillStyle = '#00a8ff';
-        ctx.fill();
-        ctx.shadowColor = '#00a8ff';
-        ctx.shadowBlur = 15;
+        ctx.moveTo(path[0].x, path[0].y);
+        for(let i=1; i<path.length; i++) ctx.lineTo(path[i].x, path[i].y);
         ctx.stroke();
 
-        ctx.fillStyle = '#00a8ff';
-        ctx.font = 'bold 12px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('Thần Tiên (Bạn)', player.x, player.y + 36);
+        // 2. Cập nhật & Vẽ Yêu Thú
+        for(let i = enemies.length - 1; i >= 0; i--) {
+            let en = enemies[i];
+            let target = path[en.pathIndex + 1];
+            if(!target) {
+                enemies.splice(i, 1);
+                state.life--;
+                if(state.life <= 0) {
+                    alert("Thủ thành thất bại! Đang reset màn chơi...");
+                    state.life = 20; state.wave = 1; state.gold = 150;
+                }
+                updateHUD();
+                continue;
+            }
 
-        // 3. Vẽ Yêu Thú Quái Vật (Đỏ)
-        let floatY = Math.sin(angle) * 8;
-        ctx.beginPath();
-        ctx.arc(monster.x, monster.y + floatY, 26, 0, Math.PI * 2);
-        ctx.fillStyle = '#ff4757';
-        ctx.shadowColor = '#ff4757';
-        ctx.shadowBlur = 20;
-        ctx.fill();
+            let dx = target.x - en.x;
+            let dy = target.y - en.y;
+            let dist = Math.hypot(dx, dy);
+            if(dist < en.speed) {
+                en.pathIndex++;
+            } else {
+                en.x += (dx / dist) * en.speed;
+                en.y += (dy / dist) * en.speed;
+            }
 
-        ctx.fillStyle = '#ff4757';
-        ctx.font = 'bold 13px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(monster.name, monster.x, monster.y + floatY - 38);
-
-        // Thanh HP Quái
-        ctx.fillStyle = '#222';
-        ctx.fillRect(monster.x - 35, monster.y + floatY - 30, 70, 6);
-        ctx.fillStyle = '#ff4757';
-        ctx.fillRect(monster.x - 35, monster.y + floatY - 30, (monster.hp / monster.maxHp) * 70, 6);
-
-        // 4. Hiệu ứng kiếm khí
-        for(let i = fxList.length - 1; i >= 0; i--) {
-            let f = fxList[i];
-            ctx.strokeStyle = '#ffd700';
-            ctx.lineWidth = f.width;
-            ctx.shadowColor = '#ffd700';
-            ctx.shadowBlur = 10;
+            // Vẽ quái
             ctx.beginPath();
-            ctx.moveTo(f.x1, f.y1);
-            ctx.lineTo(f.x2, f.y2);
-            ctx.stroke();
-            f.width -= 0.8;
-            if(f.width <= 0) fxList.splice(i, 1);
+            ctx.arc(en.x, en.y, en.radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#ff4757';
+            ctx.fill();
+
+            // Thanh máu quái
+            ctx.fillStyle = '#111';
+            ctx.fillRect(en.x - 14, en.y - 18, 28, 4);
+            ctx.fillStyle = '#2ed573';
+            ctx.fillRect(en.x - 14, en.y - 18, (en.hp / en.maxHp) * 28, 4);
         }
 
-        // 5. Hiệu ứng chữ Sát Thương
-        for(let i = dmgTexts.length - 1; i >= 0; i--) {
-            let d = dmgTexts[i];
-            ctx.fillStyle = '#ffd700';
-            ctx.font = 'bold 20px Arial';
-            ctx.shadowColor = '#000';
-            ctx.shadowBlur = 4;
-            ctx.fillText(d.text, d.x, d.y);
-            d.y -= 1.5;
-            d.alpha -= 0.03;
-            if(d.alpha <= 0) dmgTexts.splice(i, 1);
+        // 3. Cập nhật & Vẽ Trụ Phòng Thủ
+        towers.forEach(t => {
+            ctx.beginPath();
+            ctx.arc(t.x, t.y, 18, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffcc00';
+            ctx.fill();
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(t.type, t.x, t.y + 4);
+
+            // Bắn đạn tìm quái gần nhất
+            if(t.cooldown > 0) t.cooldown--;
+            else {
+                let target = enemies.find(en => Math.hypot(en.x - t.x, en.y - t.y) < t.range);
+                if(target) {
+                    target.hp -= 25 * state.atkBuff;
+                    t.cooldown = 40;
+
+                    // Hiệu ứng tia sét/đạn bắn
+                    bullets.push({x1: t.x, y1: t.y, x2: target.x, y2: target.y, alpha: 1.0});
+
+                    if(target.hp <= 0) {
+                        state.gold += 20;
+                        // Tỉ lệ rớt đồ VIP 1%
+                        if(Math.random() <= 0.01) {
+                            state.inventory.push("⚔️ Thần Binh Ỷ Thiên Kiếm (Drop 1%)");
+                            alert("🌟 NHẶT ĐƯỢC THẦN BINH Ỷ THIÊN KIẾM (Tỉ lệ 1%)!");
+                        }
+                        let idx = enemies.indexOf(target);
+                        if(idx > -1) enemies.splice(idx, 1);
+                        updateHUD();
+                    }
+                }
+            }
+        });
+
+        // 4. Vẽ hiệu ứng đạn
+        for(let i = bullets.length - 1; i >= 0; i--) {
+            let b = bullets[i];
+            ctx.strokeStyle = '#00a8ff';
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(b.x1, b.y1); ctx.lineTo(b.x2, b.y2); ctx.stroke();
+            b.alpha -= 0.1;
+            if(b.alpha <= 0) bullets.splice(i, 1);
         }
 
         requestAnimationFrame(gameLoop);
     }
 
-    function playerSkill() {
-        let dmg = state.atk + Math.floor(Math.random() * 18);
-        monster.hp -= dmg;
-
-        // Tạo hiệu ứng kiếm hiệu
-        fxList.push({
-            x1: player.x, y1: player.y - 15,
-            x2: monster.x + (Math.random()*20-10), y2: monster.y + 10,
-            width: 8
-        });
-
-        // Tạo chữ sát thương
-        dmgTexts.push({
-            text: `-${dmg}`,
-            x: monster.x + (Math.random() * 40 - 20),
-            y: monster.y - 10,
-            alpha: 1.0
-        });
-
-        if(monster.hp <= 0) {
-            state.gold += 40;
-            state.exp += 45;
-
-            // Tỉ lệ rớt đồ VIP 1%
-            if(Math.random() <= 0.01) {
-                state.inventory.push("⚔️ Thần Binh Ỷ Thiên Kiếm (+150 ATK)");
-                alert("🌟 BẠN NHẶT ĐƯỢC THẦN BINH Ỷ THIÊN KIẾM (Tỉ lệ rớt 1%)!");
-            } else if(Math.random() <= 0.15) {
-                state.inventory.push("🗡️ Đoản Đao Tiên Phong");
-            }
-
-            if(state.exp >= state.maxExp) {
-                state.level++;
-                state.exp -= state.maxExp;
-                state.maxExp = Math.floor(state.maxExp * 1.5);
-                state.maxHp += 80;
-                state.hp = state.maxHp;
-                state.atk += 15;
-            }
-
-            monster.maxHp = 100 + state.level * 25;
-                monster.hp = monster.maxHp;
-        }
-
-        updateUI();
-    }
-
-    function toggleAuto() {
-        state.auto = !state.auto;
-        let btn = document.getElementById('btn-auto-toggle');
-        if(state.auto) {
-            btn.innerText = "TREO MÁY: ĐANG BẬT";
-            btn.classList.add('active');
-            state.autoTimer = setInterval(playerSkill, 650);
-        } else {
-            btn.innerText = "TREO MÁY: TẮT";
-            btn.classList.remove('active');
-            clearInterval(state.autoTimer);
-        }
-    }
-
-    function updateUI() {
-        document.getElementById('txt-realm').innerText = `Tiên Nhân - Cảnh Giới ${state.level}`;
+    function updateHUD() {
+        document.getElementById('txt-life').innerText = state.life;
+        document.getElementById('txt-wave').innerText = state.wave;
         document.getElementById('txt-gold').innerText = state.gold;
         document.getElementById('txt-gem').innerText = state.gem;
-        document.getElementById('txt-hp-num').innerText = `${state.hp}/${state.maxHp}`;
-        document.getElementById('bar-hp').style.width = `${(state.hp/state.maxHp)*100}%`;
-        document.getElementById('txt-exp-num').innerText = `${Math.floor((state.exp/state.maxExp)*100)}%`;
-        document.getElementById('bar-exp').style.width = `${(state.exp/state.maxExp)*100}%`;
 
         let bagList = document.getElementById('bag-list');
-        bagList.innerHTML = `<p style="font-size:12px; color:#888; text-align:center;">Tỉ lệ rơi đồ VIP cực thấp (1%).</p>`;
+        bagList.innerHTML = `<p style="font-size:11px; color:#888; text-align:center;">Trang bị nhận từ thủ trụ.</p>`;
         state.inventory.forEach(item => {
             let div = document.createElement('div');
             div.className = 'item-card';
@@ -374,34 +322,26 @@
     }
 
     function topup(gems, price) {
-        if (confirm(`Xác nhận nạp gói ${price} để nhận ${gems} Kim Cương?`)) {
+        if (confirm(`Xác nhận nạp ${price}?`)) {
             state.gem += gems;
-            updateUI();
+            updateHUD();
             alert("Thanh toán thành công!");
         }
     }
 
-    function buyShopItem(type, cost) {
-        if(state.gem < cost) {
-            alert("Không đủ Kim Cương! Hãy vào mục Nạp Thẻ.");
-            return;
-        }
+    function buyShopItem(cost) {
+        if(state.gem < cost) { alert("Không đủ Kim Cương!"); return; }
         state.gem -= cost;
-        if(type === 'weapon') {
-            state.atk += 150;
-            state.inventory.push("⚔️ Thần Binh Ỷ Thiên Kiếm (Shop)");
-        } else if(type === 'armor') {
-            state.maxHp += 800;
-            state.hp += 800;
-            state.inventory.push("🛡️ Hoàng Kim Giáp (Shop)");
-        }
-        updateUI();
-        alert("Mua hàng thành công!");
+        state.atkBuff += 0.5;
+        state.inventory.push("⚔️ Thần Binh Ỷ Thiên Kiếm (Shop)");
+        updateHUD();
+        alert("Mua thành công, tăng sát thương tháp!");
     }
 
     window.onload = () => {
-        initGame();
-        updateUI();
+        resizeCanvas();
+        updateHUD();
+        gameLoop();
     };
 </script>
 </body>
